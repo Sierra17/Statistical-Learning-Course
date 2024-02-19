@@ -1,0 +1,58 @@
+---
+title: "Assignment Ridge Regression"
+author: "Luis Sierra Muntané"
+date: "2024-02-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The dataset in question is the classic Boston, Massachussets. https://lib.stat.cmu.edu/datasets/boston
+
+
+```{r}
+prostate <- read.table("prostate_data.txt", header=TRUE, row.names = 1)
+# plot(prostate)
+train.sample <- which(prostate$train==TRUE)
+
+library(MASS)
+data(Boston)
+
+```
+
+```{r}
+Y <- scale( prostate$lpsa[use.only], center=TRUE, scale=FALSE)
+X <- scale( as.matrix(prostate[use.only,1:8]), center=TRUE, scale=TRUE)
+n <- dim(X)[1]
+p <- dim(X)[2]
+```
+
+
+Function to estimate the $PMSE_{\text{VAL}}(\lambda)$ according to a given train-validation split.
+
+```{r}
+ridge_regression <- function(X, y, lambda) {
+  beta.path <- matrix(0,nrow=n.lambdas, ncol=p)
+  diag.H.lambda <- matrix(0,nrow=n.lambdas, ncol=n)
+  df <- dim(X)[2]
+  return(c(beta, diag.H.lambda, df))
+}
+
+# Returns the vector of parameters minimising the PMSE(lambda)
+loocv_pmse <- function(X, y, X_val, y_val, lambda) {
+  # H.lambda.aux <- t(solve(t(X)%*%X + lambda*diag(1,dim(X)[2]))) %*% t(X)
+  beta <- solve(t(X)%*%X + lambda*diag(1,dim(X)[2]))%*%t(X)%*%y
+  residuals <- (X_val%*%beta - y_val)^2
+  # Weights as influence of each data point on its own predicted value
+  w <- diag(X%*%solve(t(X)%*%X + lambda*diag(1,dim(X)[2]))%*%t(X))
+  squared_errors <- residuals/(1 - w)
+  best_index <- which.min(squared_errors)
+  PMSE.CV <- min(squared_errors)
+  return(PMSE.CV)
+}
+
+#lapply(lambda.v, loocv_pmse, X_train, y_train, X_val, y_val)
+```
+
