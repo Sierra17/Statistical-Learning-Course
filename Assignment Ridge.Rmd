@@ -49,10 +49,34 @@ loocv_pmse <- function(X, y, X_val, y_val, lambda) {
   w <- diag(X%*%solve(t(X)%*%X + lambda*diag(1,dim(X)[2]))%*%t(X))
   squared_errors <- residuals/(1 - w)
   best_index <- which.min(squared_errors)
-  PMSE.CV <- min(squared_errors)
+  PMSE.CV <- mean(squared_errors)
   return(PMSE.CV)
 }
 
-#lapply(lambda.v, loocv_pmse, X_train, y_train, X_val, y_val)
+lambda_tuning <- function(lambda.v){
+  PMSE.CV.values <- lapply(lambda.v, loocv_pmse)
+  index <- which.min(PMSE.CV.values)
+  return(lambda.v[index])
+}
 ```
 
+Effective degrees of freedom $\text{df}(\lambda)$
+
+```{r}
+
+effective_df <- function(lambda, X){
+  d2 <- eigen(t(X)%*%X,symmetric = TRUE, only.values = TRUE)$values
+  return(sum(d2/(d2+lambda)))
+}
+
+Main:
+
+```{r}
+lambda.max <- 1e5
+n.lambdas <- 25
+lambda.v <- exp(seq(0,log(lambda.max+1),length=n.lambdas))-1
+
+PMSE.CV <- lapply(lambda.v, loocv_pmse, X_train, y_train, X_val, y_val)
+
+plot(log(1+lambda.v)-1, PMSE.CV)
+```
