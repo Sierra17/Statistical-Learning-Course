@@ -68,7 +68,7 @@ effective_df <- function(lambda, X){
   d2 <- eigen(t(X)%*%X,symmetric = TRUE, only.values = TRUE)$values
   return(sum(d2/(d2+lambda)))
 }
-
+```
 Main:
 
 ```{r}
