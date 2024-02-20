@@ -1,8 +1,10 @@
 ---
-title: "Assignment 1: Ridge Regression"
+title: 'Assignment 1: Ridge Regression'
 author: "Victor Villegas, Roger Llorenç, Luis Sierra"
 date: "2024-02-21"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -23,8 +25,8 @@ data(Boston)
 ```
 
 ```{r}
-Y <- scale( prostate$lpsa[use.only], center=TRUE, scale=FALSE)
-X <- scale( as.matrix(prostate[use.only,1:8]), center=TRUE, scale=TRUE)
+Y <- scale( prostate$lpsa, center=TRUE, scale=FALSE)
+X <- scale( as.matrix(prostate[,1:8]), center=TRUE, scale=TRUE)
 n <- dim(X)[1]
 p <- dim(X)[2]
 ```
@@ -77,13 +79,17 @@ PMSE_gcv <- function(lambda, X, Y) {
   return(PMSE.CV)
 }
 
+# Shrinkage hyperparameter range
+lambda.max <- 1e5
+n.lambdas <- 25
 lambda.v <- exp(seq(0,log(lambda.max+1),length=n.lambdas))-1
 
 PMSE.CV.values <- lapply(lambda.v, PMSE_loocv, X, Y)
 index <- which.min(PMSE.CV.values)
 best_lambda <- lambda.v[index]
-plot(log(1+lambda.v), PMSE.CV.values, xlabel = "log(1+lambda)")
-# plot(df.v, PMSE.CV.values, xlabel="df(lambda)")
+plot(log(1+lambda.v), PMSE.CV.values, xlab = "log(1+lambda)")
+abline(v=log(1+best_lambda),col=2,lty=2)
+# plot(df.v, PMSE.CV.values, xlab="df(lambda)")
 
 ```
 
@@ -131,24 +137,21 @@ PMSE_kfold <- function(X, Y, lambda.v, fold_indices) {
   return(PMSE.CV_kfold)
 }
 
-
-
-
 ```
 
 Now we will apply use the previously defined functions to perform a ridge regression on our datasets, starting on the prostate cancer data.
 
 ```{r}
-Y <- scale( prostate$lpsa, center=TRUE, scale=FALSE) # Center but no rescaling cuz its the response
+Y <- scale(prostate$lpsa, center=TRUE, scale=FALSE) # Center but no rescaling on the response
 X <- scale(as.matrix(prostate[,1:8]), center = TRUE, scale = TRUE) # Center and rescaling, predictor variables
 
 n <- nrow(X)
-lambda.v <- exp(seq(0,log(lambda.max+1),length=n.lambdas))-1 
+lambda.v <- exp(seq(0,log(lambda.max+1),length=n.lambdas))-1
 
 PMSE.CV_loocv <- lapply(lambda.v, PMSE_loocv, X, Y)
-lambda.CV_loo <- lambda.v[which.min(PMSE.CV_loocv)] # Returns the index which we select
-plot(log(1+lambda.v), PMSE.CV_loo, xlab = "log(1+lambda)", ylab="PMSE.CV_loo")
-abline(v=log(1+lambda.CV_loo),col=2,lty=2)
+lambda.CV_loocv <- lambda.v[which.min(PMSE.CV_loocv)] # Returns the index which we select
+plot(log(1+lambda.v), PMSE.CV_loocv, xlab = "log(1+lambda)", ylab="PMSE.CV_loo")
+abline(v=log(1+lambda.CV_loocv),col=2,lty=2)
 
 # Folds of size 5
 fold_indices <- split_indices(n, 5)
@@ -162,10 +165,94 @@ PMSE.CV_kfold <- PMSE_kfold(X, Y, lambda.v, fold_indices)
 PMSE.CV_gcv <- lapply(lambda.v, PMSE_gcv, X, Y)
 lambda.CV_gcv <- lambda.v[which.min(PMSE.CV_gcv)]
 
-plot(log(1+lambda.v), PMSE.CV_loo, xlab = "log(1+lambda)", ylab="PMSE.CV_gcv")
+plot(log(1+lambda.v), PMSE.CV_gcv, xlab = "log(1+lambda)", ylab="PMSE.CV_gcv")
 abline(v=log(1+lambda.CV_gcv),col=2,lty=2)
 
 ```
 
+# 2. Ridge regression for the Boston Housing data
 
+Now moving on to the Boston dataset, we shall apply the same transformations to then find the best possible $\lambda$ by cross validation.
 
+```{r}
+Y <- scale(Boston$medv, center=TRUE, scale=FALSE) # Center but no rescaling on the response
+X <- scale(as.matrix(Boston[,1:13]), center = TRUE, scale = TRUE) # Center and rescaling,
+
+n <- dim(X)[1]
+p <- dim(X)[2]
+lambda.max <- 1e5
+n.lambdas <- 25
+lambda.v <- exp(seq(0,log(lambda.max+1),length=n.lambdas))-1
+
+```
+
+We use the same range of values for $\lambda$.
+
+```{r}
+PMSE.CV_loocv <- lapply(lambda.v, PMSE_loocv, X, Y)
+lambda.CV_loocv <- lambda.v[which.min(PMSE.CV_loocv)] # Returns the index which we select
+plot(log(1+lambda.v), PMSE.CV_loocv, xlab = "log(1+lambda)", ylab="PMSE.CV_loo")
+abline(v=log(1+lambda.CV_loocv),col=2,lty=2)
+
+# Folds of size 5
+fold_indices5 <- split_indices(n, 5)
+PMSE.CV_kfold5 <- PMSE_kfold(X, Y, lambda.v, fold_indices5)
+lambda.CV_kfold5 <- lambda.v[which.min(PMSE.CV_kfold5)]
+
+plot(log(1+lambda.v), PMSE.CV_kfold5, xlab = "log(1+lambda)", ylab="PMSE.CV_kfold5")
+abline(v=log(1+lambda.CV_kfold5),col=2,lty=2)
+
+# Folds of size 10
+fold_indices10 <- split_indices(n, 10)
+PMSE.CV_kfold10 <- PMSE_kfold(X, Y, lambda.v, fold_indices10)
+lambda.CV_kfold10 <- lambda.v[which.min(PMSE.CV_kfold10)]
+
+plot(log(1+lambda.v), PMSE.CV_kfold10, xlab = "log(1+lambda)", ylab="PMSE.CV_kfold10")
+abline(v=log(1+lambda.CV_kfold10),col=2,lty=2)
+
+# Generalised Cross Validation
+PMSE.CV_gcv <- lapply(lambda.v, PMSE_gcv, X, Y)
+lambda.CV_gcv <- lambda.v[which.min(PMSE.CV_gcv)]
+
+plot(log(1+lambda.v), PMSE.CV_gcv, xlab = "log(1+lambda)", ylab="PMSE.CV_gcv")
+abline(v=log(1+lambda.CV_gcv),col=2,lty=2)
+```
+
+Finally, we shall take a look at the path the coefficients take to analyse the behaviour of the model as the value of $\lambda$ evolves.
+
+```{r}
+# Coefficients path
+beta.path <- matrix(0,nrow=n.lambdas, ncol=p)
+diag.H.lambda <- matrix(0,nrow=n.lambdas, ncol=n)
+for (l in 1:n.lambdas){ 
+  lambda <- lambda.v[l]
+  H.lambda.aux <- t(solve(t(X)%*%X + lambda*diag(1,p))) %*% t(X) 
+  beta.path[l,] <-  H.lambda.aux %*% Y
+  H.lambda <- X %*% H.lambda.aux 
+  diag.H.lambda[l,] <- diag(H.lambda)
+} 
+plot(c(-1,log(1+lambda.v[n.lambdas])), range(beta.path),type="n",
+     xlab="log(1+lambda)",ylab="coefficients")
+abline(h=0,lty=2)
+abline(v=log(1+lambda.CV_kfold10),col=2,lty=2)
+for(j in 1:p){
+  lines(log(1+lambda.v),beta.path[,j],col=4)
+  points(log(1+lambda.v),beta.path[,j],pch=19,cex=.7,col=4)
+}
+text(0*(1:p), beta.path[1,],names(Boston)[1:p],pos=2)
+
+df.v <- lapply(lambda.v, effective_df, X)
+               
+# estimated coefficients path against effective degrees of freedom
+plot(c(0,p+1), range(beta.path),type="n",xlab="df(lambda)",ylab="coefficients")
+abline(h=0,lty=2)
+abline(v=log(1+lambda.CV_kfold10),col=2,lty=2)
+PMSE.CV_kfold <- PMSE_kfold(X, Y, lambda.v, fold_indices)
+for(j in 1:p){
+  lines(df.v,beta.path[,j],col=4)
+  points(df.v,beta.path[,j],pch=19,cex=.7,col=4)
+}
+text(p+0*(1:p), beta.path[1,],names(Boston)[1:p],pos=4)
+```
+
+We have added the $10$-fold CV $\lambda$ to the previous coefficient path evolution to see where the supposedly best $\lambda$ leaves the values of the coefficients, and indeed it shrinks them all by a similar amount, and the *indus* and *age* variables, which were small for the unrestricted model, are left close to zero when the corss validation attains the minimum PMSE.
