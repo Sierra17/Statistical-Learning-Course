@@ -1,0 +1,78 @@
+---
+title: "Assignment 1: Ridge Regression"
+author: "Victor Villegas, Roger Llorenç, Luis Sierra"
+date: "2024-02-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+The datasets used in this assignment are the medical *prostate_data.txt* file, and the classic dataset on crime from Boston, Massachussets. https://lib.stat.cmu.edu/datasets/boston
+
+First, we import the data and scale it appropriately, by centering and normalizing the variables.
+
+```{r}
+prostate <- read.table("prostate_data.txt", header=TRUE, row.names = 1)
+# plot(prostate)
+train.sample <- which(prostate$train==TRUE)
+
+library(MASS)
+data(Boston)
+
+```
+
+```{r}
+Y <- scale( prostate$lpsa[use.only], center=TRUE, scale=FALSE)
+X <- scale( as.matrix(prostate[use.only,1:8]), center=TRUE, scale=TRUE)
+n <- dim(X)[1]
+p <- dim(X)[2]
+```
+
+# 1. Chosing the penalization parameter $\lambda$:
+
+The functions in the following section provide a way of finding the best value for the hyperparameter $\lambda$ by estimating the PMSE in a validation set.
+
+```{r}
+# Calculates the effective degrees of freedom in a ridge regression model fit
+effective_df <- function(lambda, X){
+  d2 <- eigen(t(X)%*%X,symmetric = TRUE, only.values = TRUE)$values
+  return(sum(d2/(d2+lambda)))
+}
+
+
+# Fits a ridge regression with inputs explanatory variables X, response y, penalty lambda
+ridge_regression <- function(X, y, lambda) {
+  beta.par <- solve(t(X)%*%X + lambda*diag(1,dim(X)[2]))%*%t(X)%*%y
+  H.lambda <- X%*%t(solve(t(X)%*%X + lambda*diag(1,dim(X)[2]))) %*% t(X)
+  df <- effective_df(lambda, X)
+  return(list(beta.par = beta.par, H.lambda = H.lambda, df = df))
+}
+
+
+# Returns the vector of parameters minimising the PMSE(lambda)
+PMSE_loocv <- function(lambda, X, y) {
+  output <- ridge_regression(X, y, lambda)
+  H.lambda <- output$H.lambda
+  residuals <- (H.lambda%*%y - y)^2
+  # Weights as influence of each data point on its own predicted value
+  w <- diag(X%*%solve(t(X)%*%X + lambda*diag(1,dim(X)[2]))%*%t(X))
+  squared_errors <- residuals/(1 - w)
+  best_index <- which.min(squared_errors)
+  PMSE.CV <- mean(squared_errors)
+  return(PMSE.CV)
+}
+
+lambda.v <- exp(seq(0,log(lambda.max+1),length=n.lambdas))-1
+
+PMSE.CV.values <- lapply(lambda.v, PMSE_loocv, X, Y)
+index <- which.min(PMSE.CV.values)
+best_lambda <- lambda.v[index]
+plot(log(1+lambda.v), PMSE.CV.values, xlabel = "log(1+lambda)")
+# plot(df.v, PMSE.CV.values, xlabel="df(lambda)")
+
+```
+
+
+
+
