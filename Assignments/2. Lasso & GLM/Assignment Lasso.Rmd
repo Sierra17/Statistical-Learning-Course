@@ -1,0 +1,23 @@
+---
+title: 'Assignment 2: Lasso and GLM'
+author: "Victor Villegas, Roger Llorenç, Luis Sierra"
+date: "2024-02-27"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Lasso for the Boston Housing data
+
+For this assignment, we will again be working with the Boston Housing dataset from https://lib.stat.cmu.edu/datasets/boston
+
+```{r}
+Y <- scale(Boston$medv, center=TRUE, scale=FALSE) # Center but no rescaling on the response
+X <- scale(as.matrix(Boston[,1:13]), center = TRUE, scale = TRUE) # Center and rescaling,
+n <- dim(X)[1]
+p <- dim(X)[2]
+```
