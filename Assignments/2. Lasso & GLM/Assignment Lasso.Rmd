@@ -11,13 +11,26 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Loading the necessary libraries and preparing the datasets. This time, we will be using a modified version of the Boston dataset, as well as two biological datasets.
+
+```{r}
+library(glmnet)
+Boston <- load("boston.Rdata")
+express <- read.csv("journal.pbio.0020108.sd012.CSV",header=FALSE)
+surv <- read.csv("journal.pbio.0020108.sd013.CSV",header=FALSE)
+
+death <- (surv[,2]==1)
+log.surv <- log(surv[death,1]+.05)
+expr <- as.matrix(t(express[,death]))
+```
+
 # 1. Lasso for the Boston Housing data
 
 For this assignment, we will again be working with the Boston Housing dataset from https://lib.stat.cmu.edu/datasets/boston
 
 ```{r}
-Y <- scale(Boston$medv, center=TRUE, scale=FALSE) # Center but no rescaling on the response
-X <- scale(as.matrix(Boston[,1:13]), center = TRUE, scale = TRUE) # Center and rescaling,
+Y <- scale(boston.c$CMEDV, center=TRUE, scale=FALSE) # Center but no rescaling on the response
+#X <- scale(as.matrix(Boston[,1:13]), center = TRUE, scale = TRUE) # Center and rescaling,
 n <- dim(X)[1]
 p <- dim(X)[2]
 ```
