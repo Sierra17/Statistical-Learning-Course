@@ -26,11 +26,66 @@ expr <- as.matrix(t(express[,death]))
 
 # 1. Lasso for the Boston Housing data
 
-For this assignment, we will again be working with the Boston Housing dataset from https://lib.stat.cmu.edu/datasets/boston
+```{r}
+anyNA(boston.c)
+Y <- scale(boston.c$CMEDV, center=TRUE, scale=FALSE)
+X <- scale(as.matrix(boston.c[,8:20]), center=TRUE, scale=TRUE) # Exclude response variable
+
+p <- dim(X)[1]
+n <- dim(X)[2]
+```
 
 ```{r}
-Y <- scale(boston.c$CMEDV, center=TRUE, scale=FALSE) # Center but no rescaling on the response
-#X <- scale(as.matrix(Boston[,1:13]), center = TRUE, scale = TRUE) # Center and rescaling,
+#Y <- scale(Boston$medv, center=TRUE, scale=FALSE) # Center but no rescaling on the response
+X <- as.matrix(boston.c[,8:20]) # Center and rescaling,
 n <- dim(X)[1]
 p <- dim(X)[2]
 ```
+
+# 2. A regression model with $p>>n$:
+
+Using *glmnet* we shall fit, using LASSO with different shrinkage parameters, the logarithm of the survival time against a large set of gene expressions.
+
+### 2.1. In the following two figures we show the optimal value of $\lambda$
+
+```{r}
+fit <- glmnet(expr, log.surv)
+```
+
+```{r}
+plot(fit)
+```
+
+Selecting the best shrinkage parameter $\lambda$ by cross validation
+
+```{r}
+cvfit <- cv.glmnet(expr, log.surv)
+```
+
+```{r}
+plot(cvfit)
+```
+```{r}
+cvfit$lambda.min
+cvfit$lambda.1se
+coefs_min <- coef(cvfit, s = "lambda.min")
+coefs_reg <- coef(cvfit, s = "lambda.1se")
+```
+
+Only three coefficients are different from zero for the minimum PMSE
+
+## 2. 
+
+```{r}
+Y_hat <- predict(cvfit, newx = expr, s = "lambda.min")
+```
+
+## 3. Non-zero coefficients are 
+
+```{r}
+
+```
+
+## 4. 
+
+
