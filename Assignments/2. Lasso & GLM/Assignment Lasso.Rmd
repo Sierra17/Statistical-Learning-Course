@@ -1,6 +1,6 @@
 ---
 title: 'Assignment 2: Lasso and GLM'
-author: "Victor Villegas, Roger Llorenç, Luis Sierra"
+author: "Víctor Villegas, Roger Llorenç, Luis Sierra"
 date: "2024-02-27"
 output:
   html_document: default
