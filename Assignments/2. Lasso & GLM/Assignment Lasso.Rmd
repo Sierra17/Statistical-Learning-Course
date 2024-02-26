@@ -65,27 +65,43 @@ cvfit <- cv.glmnet(expr, log.surv)
 ```{r}
 plot(cvfit)
 ```
+
 ```{r}
 cvfit$lambda.min
 cvfit$lambda.1se
 coefs_min <- coef(cvfit, s = "lambda.min")
 coefs_reg <- coef(cvfit, s = "lambda.1se")
+coefs_min@i
+coefs_reg@i
 ```
 
-Only three coefficients are different from zero for the minimum PMSE
+Only three coefficients are different from zero for the minimum PMSE, and note that for the 1-SE values, the coefficients are all zero and we are left with the null model (always predict the intercept).
 
-## 2. 
+### 2.2.
 
 ```{r}
 Y_hat <- predict(cvfit, newx = expr, s = "lambda.min")
+barplot(log.surv, Y_hat)
 ```
 
-## 3. Non-zero coefficients are 
+### 2.3. OLS with non-zero coefficients set $S_0$ from Lasso fit
 
 ```{r}
-
+S_0 <- coefs_min@i # S_0[1] is intercept
+ols_model <- lm(log.surv ~ expr[,S_0[2]] + expr[,S_0[3]] + expr[,S_0[4]])
+coefs_ols <- ols_model$coefficients
+coefs_ols
+coefs_min@x
 ```
 
-## 4. 
+### 2.4. Comparing fitted Lasso and OLS coefficients:
+
+```{r}
+coef_names <- c("Intercept", "G2252", "G3787", "G5352")
+names(coefs_ols) <- coef_names
+#coefs_ols
+#coefs_min@x
+barplot(rbind(coefs_ols, coefs_min@x), xlab='Gene Coefficients', col=c("darkblue","red"), beside=TRUE)
+```
 
 
