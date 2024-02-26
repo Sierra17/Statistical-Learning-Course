@@ -15,7 +15,7 @@ Loading the necessary libraries and preparing the datasets. This time, we will b
 
 ```{r}
 library(glmnet)
-Boston <- load("boston.Rdata")
+load("boston.Rdata")
 express <- read.csv("journal.pbio.0020108.sd012.CSV",header=FALSE)
 surv <- read.csv("journal.pbio.0020108.sd013.CSV",header=FALSE)
 
@@ -27,7 +27,8 @@ expr <- as.matrix(t(express[,death]))
 # 1. Lasso for the Boston Housing data
 
 ```{r}
-anyNA(boston.c)
+# anyNA(boston.c)
+boston.c$CHAS <- as.numeric(boston.c$CHAS)
 Y <- scale(boston.c$CMEDV, center=TRUE, scale=FALSE)
 X <- scale(as.matrix(boston.c[,8:20]), center=TRUE, scale=TRUE) # Exclude response variable
 
@@ -36,10 +37,13 @@ n <- dim(X)[2]
 ```
 
 ```{r}
-#Y <- scale(Boston$medv, center=TRUE, scale=FALSE) # Center but no rescaling on the response
-X <- as.matrix(boston.c[,8:20]) # Center and rescaling,
-n <- dim(X)[1]
-p <- dim(X)[2]
+fit_boston <- glmnet(X, Y)
+```
+
+In the following plot we show the path of the parameters as we decrease the value of the shrinkage parameter $\lambda$.
+
+```{r}
+plot(fit_boston)
 ```
 
 # 2. A regression model with $p>>n$:
@@ -75,13 +79,15 @@ coefs_min@i
 coefs_reg@i
 ```
 
-Only three coefficients are different from zero for the minimum PMSE, and note that for the 1-SE values, the coefficients are all zero and we are left with the null model (always predict the intercept).
+Only three coefficients are different from zero for the minimum PMSE, and note that for the 1-SE values, the coefficients are all zero and we are left with the null model (always predict the mean average).
 
-### 2.2.
+### 2.2. Computing fitted values with Lasso parameters.
 
 ```{r}
 Y_hat <- predict(cvfit, newx = expr, s = "lambda.min")
-barplot(log.surv, Y_hat)
+x = seq(from=-3, to=3, 0.1)
+plot(log.surv, Y_hat)
+lines(x,x)
 ```
 
 ### 2.3. OLS with non-zero coefficients set $S_0$ from Lasso fit
@@ -99,9 +105,8 @@ coefs_min@x
 ```{r}
 coef_names <- c("Intercept", "G2252", "G3787", "G5352")
 names(coefs_ols) <- coef_names
-#coefs_ols
-#coefs_min@x
 barplot(rbind(coefs_ols, coefs_min@x), xlab='Gene Coefficients', col=c("darkblue","red"), beside=TRUE)
+abline(h=0)
 ```
 
 
