@@ -85,9 +85,8 @@ Only three coefficients are different from zero for the minimum PMSE, and note t
 
 ```{r}
 Y_hat <- predict(cvfit, newx = expr, s = "lambda.min")
-x = seq(from=-3, to=3, 0.1)
-plot(log.surv, Y_hat)
-lines(x,x)
+plot(log.surv, Y_hat, asp=1)
+abline(a=0,b=1,col=2)
 ```
 
 ### 2.3. OLS with non-zero coefficients set $S_0$ from Lasso fit
@@ -105,8 +104,20 @@ coefs_min@x
 ```{r}
 coef_names <- c("Intercept", "G2252", "G3787", "G5352")
 names(coefs_ols) <- coef_names
-barplot(rbind(coefs_ols, coefs_min@x), xlab='Gene Coefficients', col=c("darkblue","red"), beside=TRUE)
+barplot(rbind(coefs_ols, coefs_min@x), xlab='Gene Coefficients', col=c("darkblue","red"), legend = c("OLS", "Lasso"), beside=TRUE)
 abline(h=0)
 ```
 
+We can see how the coefficients for the OLS model are larger than for Lasso, which is to be expected since there is no shrinkage involved. In the following chunck we can see a breakdown of the OLS model, where we can see how all predictive variables are statistically significant, but the adjusted $R^2$ is around 0.25, indicating that this model explains a low amount of the variance in the dataset.
 
+```{r}
+summary(ols_model)
+```
+
+What happens now with the predictions? They are, optically, somewhat better to those produced by the Lasso model, and indeed we can see a tendency, albeit a weak one, between the predictions and the sample data.
+
+```{r}
+Y_hat_ols <- predict(ols_model, newx = expr)
+plot(log.surv, Y_hat_ols, asp=1)
+abline(a=0,b=1,col=2)
+```
