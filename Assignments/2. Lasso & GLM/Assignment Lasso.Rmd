@@ -116,12 +116,33 @@ plot(cvfit)
 ```
 
 ```{r}
+plot(fit, xvar = "lambda")
+abline(v = log(cvfit$lambda.min), col = 2, lty = 2)
+abline(v = log(cvfit$lambda.1se), col = 2, lty = 2)
+```
+
+Results for \lambda_{min}:
+```{r}
 cvfit$lambda.min
-cvfit$lambda.1se
+
 coefs_min <- coef(cvfit, s = "lambda.min")
+
+print("The coefficients sorted by impact for lambda_{min} are: ")
+coefs_min_aux = coefs_min[-1,]; 
+sorted_coefs_min = coefs_min_aux[order(abs(coefs_min_aux))]
+sorted_coefs_min[sorted_coefs_min != 0]
+
+```
+Results for \lambda_{1se}:
+```{r}
+cvfit$lambda.1se
+
 coefs_reg <- coef(cvfit, s = "lambda.1se")
-coefs_min@i
-coefs_reg@i
+
+print("The coefficients sorted by impact for lambda_{min} are: ")
+coefs_reg_aux = coefs_reg[-1,]; 
+sorted_coefs_reg = coefs_reg_aux[order(abs(coefs_reg_aux))]
+sorted_coefs_reg[sorted_coefs_reg != 0]; print("That is, all coefficients are zero.")
 ```
 
 Only three coefficients are different from zero for the minimum PMSE, and note that for the 1-SE values, the coefficients are all zero and we are left with the null model (always predict the mean average).
