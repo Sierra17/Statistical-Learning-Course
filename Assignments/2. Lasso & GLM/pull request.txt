@@ -1,0 +1,39 @@
+1. This step implements the Lasso regularization, which shrinks some regression coefficients to zero, effectively performing variable selection.
+
+This graphical representation helps in understanding the impact of regularization on the model parameters and aids in selecting an appropriate level of regularization.
+
+
+
+
+2.1 The indices of non-zero coefficients for both the minimum PMSE (coefs_min@i) and 1-SE values (coefs_reg@i) are displayed. This information is crucial for understanding which genes are selected by the Lasso estimator.
+
+The result indicates that only three coefficients are different from zero for the minimum PMSE (lambda.min), and for the 1-SE values, all coefficients are zero, resulting in the null model where the prediction is always the mean average. This emphasizes the sparsity-inducing property of Lasso regularization, effectively performing variable selection in the context of gene expression regression.
+
+
+2.2 In this step, we use the Lasso model with the selected shrinkage parameter (lambda.min) to compute the fitted values (Y_hat) for the logarithm of survival time. The plot compares the observed values (log.surv) with the Lasso fitted values. The diagonal line (colored red) represents perfect alignment between observed and fitted values. Deviations from this line indicate the model's performance in predicting survival time based on gene expressions.
+
+The plot helps assess the accuracy of the Lasso model by visualizing how well the predicted values align with the actual survival times. The abline function adds a reference line with a slope of 1 and intercept of 0 (the red diagonal line), representing perfect predictions.
+
+
+2.3. The resulting ols_model object contains information about the OLS regression model, including the estimated coefficients. The extracted OLS coefficients (coefs_ols) are displayed, providing insights into the regression coefficients obtained through traditional least squares regression for the selected non-zero Lasso coefficients.
+
+Comparing the OLS coefficients with the Lasso coefficients (coefs_min@x) sheds light on the impact of Lasso regularization in terms of coefficient shrinkage and variable selection. This step helps in understanding how the Lasso-regularized model differs from the OLS model with selected non-zero coefficients.
+
+
+2.4 This barplot compares the coefficients obtained from the OLS and Lasso regression models. The x-axis represents different gene coefficients, including an intercept, denoted by "Intercept" and specific gene names (e.g., "G2252", "G3787", "G5352"). The y-axis represents the coefficient values. The dark blue bars represent OLS coefficients, while the red bars represent Lasso coefficients. The horizontal line at 0 indicates the absence of coefficient values.
+
+The visual comparison highlights the shrinkage effect introduced by Lasso regularization. Noticeably, Lasso tends to shrink coefficients toward zero, and some coefficients may be exactly zero, indicating variable selection. In contrast, OLS coefficients are larger, reflecting no shrinkage.
+
+# Display summary statistics for the OLS model
+summary(ols_model)
+
+The summary statistics provide additional information about the OLS regression model. It includes coefficients, standard errors, t-values, and p-values for each predictor. In this case, all predictive variables are statistically significant. However, the adjusted R^2 is around 0.25, indicating that the OLS model explains a relatively low amount of the variance in the dataset.
+
+# Compare predictions of OLS and Lasso models
+Y_hat_ols <- predict(ols_model, newx = expr)
+plot(log.surv, Y_hat_ols, asp=1)
+abline(a=0, b=1, col=2)
+
+ This scatter plot compares the observed values of the response variable (log.surv) with the fitted values obtained from the OLS model (Y_hat_ols). The diagonal line (colored red) represents perfect alignment between observed and fitted values. The plot helps assess the predictive performance of the OLS model in comparison to the Lasso model.
+
+Observing a tendency, albeit weak, between the predictions and the sample data suggests that the OLS model may capture certain patterns better than the Lasso model, particularly when dealing with a larger set of predictors compared to the number of observations. However, it's essential to interpret these results cautiously and consider the trade-off between model complexity and interpretability.
