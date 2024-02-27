@@ -11,7 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Loading the necessary libraries and preparing the datasets. This time, we will be using a modified version of the Boston dataset, as well as two biological datasets.
+Loading the necessary libraries and preparing the datasets. This time, we will be using a modified version of the Boston dataset, as well as a biological dataset from two files, concerned on survival time dependent on genes.
 
 ```{r}
 library(glmnet)
@@ -35,9 +35,11 @@ X <- scale(as.matrix(boston.c[,8:20]), center=TRUE, scale=TRUE) # Exclude respon
 p <- dim(X)[1]
 n <- dim(X)[2]
 ```
-glment for boston data
+
+After scaling the variables, we use *glmnet* on the Boston dataset to find the Lasso analysis. Note that the cross-validation fit has a probabilistic component, so we declare a seed.
 
 ```{r}
+set.seed(1234) # To ensure replicability
 fit_boston <- glmnet(X, Y)
 cv_fit_boston <- cv.glmnet(X, Y)
 ```
@@ -59,7 +61,7 @@ abline(v = log(cv_fit_boston$lambda.min), col = 2, lty = 2)
 abline(v = log(cv_fit_boston$lambda.1se), col = 2, lty = 2)
 text(0*(1:p)+(-5),fit_boston$beta[ ,77],colnames(X),pos=4)
 ```
-The minimum lambda, and the coefficients sorted by impact and their value are shown below:
+The minimum $\lambda$ and the coefficients sorted by impact and their values are shown below:
 
 ```{r}
 cv_fit_boston$lambda.min
@@ -69,11 +71,11 @@ print("The coefficients sorted by impact for lambda_{min} are: ")
 coefs_min_boston_aux = coefs_min_boston[-1,]
 coefs_min_boston_aux[order(abs(coefs_min_boston_aux))]
 ```
-From these observations, "AGE" (proportion of owner-occupied units built prior to 1940) and "INDUS" (proportion of non-retail business acres per town) seem to be the less important predictors to determine the medium value of the home. 
+From these observations, *"AGE"* (proportion of owner-occupied units built prior to 1940) and *"INDUS"* (proportion of non-retail business acres per town) seem to be the least relevant predictors to determine the median value of a home. 
 
-The most important predictors seem to be "LSTAT" (% of lower status of the population), "DIS" (weighted distances to five Boston employment centers) and "RM" (average number of rooms per dwelling).
+The most impactful predictors seem to be *"LSTAT"* (% of lower status of the population), *"DIS"* (weighted distances to five Boston employment centers) and *"RM"* (average number of rooms per dwelling).
 
-The one standard error lambda, and the coefficients sorted by impact and their value are shown below:
+The 1-SE, or one standard error $\lambda$, and the coefficients sorted by impact and their value are shown below:
 
 ```{r}
 cv_fit_boston$lambda.1se
@@ -84,14 +86,13 @@ coefs_reg_boston_aux = coefs_reg_boston[-1,]
 coefs_reg_boston_aux[order(abs(coefs_reg_boston_aux))]
 ```
 
+From these observations, *"AGE"* and *"INDUS"* are still zero and *"RAD"* (index of accessibility to radial highways) and *"TAX"* ( full-value property-tax rate per $10,000) join the zero-valued coefficients. 
 
-From these observations, "AGE" and "INDUS" are still zero and "RAD" (index of accessibility to radial highways) and "TAX" ( full-value property-tax rate per $10,000) join the zero-valued coefficients. 
-
-The most important predictors are still the same ("LSTAT", "DIS" and "RM") with the addition of "PTRATIO" (pupil-teacher ratio by town).
+The most impactful predictors are still the same (*"LSTAT"*, *"DIS"* and *"RM"*) with the addition of *"PTRATIO"* (pupil-teacher ratio by town).
 
 # 2. A regression model with $p>>n$:
 
-Using *glmnet* we shall fit, using LASSO with different shrinkage parameters, the logarithm of the survival time against a large set of gene expressions.
+Using *glmnet* we shall fit, using Lasso with different shrinkage parameters, the logarithm of the survival time against a large set of gene expressions.
 
 ### 2.1. In the following two figures we show the optimal value of $\lambda$
 
@@ -103,9 +104,10 @@ fit <- glmnet(expr, log.surv)
 plot(fit)
 ```
 
-Selecting the best shrinkage parameter $\lambda$ by cross validation
+Selecting the best shrinkage parameter $\lambda$ by cross validation, again defining a seed to ensure replicability.
 
 ```{r}
+set.seed(1234) # To ensure replicability
 cvfit <- cv.glmnet(expr, log.surv)
 ```
 
@@ -132,6 +134,8 @@ plot(log.surv, Y_hat, asp=1)
 abline(a=0,b=1,col=2)
 ```
 
+From this plot we can see how, despite there being some correlation, it is indeed rather weak.
+
 ### 2.3. OLS with non-zero coefficients set $S_0$ from Lasso fit
 
 ```{r}
@@ -140,6 +144,16 @@ ols_model <- lm(log.surv ~ expr[,S_0[2]] + expr[,S_0[3]] + expr[,S_0[4]])
 coefs_ols <- ols_model$coefficients
 coefs_ols
 coefs_min@x
+```
+
+Only three coefficients were non-zero after the cross-validation, those corresponding to genes $2252$, $3787$ and $5352$.
+
+What happens now with the predictions? They are, optically, somewhat better to those produced by the Lasso model, and indeed we can see a tendency, albeit still a weak one, between the predictions and the sample data.
+
+```{r}
+Y_hat_ols <- predict(ols_model, newx = expr)
+plot(log.surv, Y_hat_ols, asp=1)
+abline(a=0,b=1,col=2)
 ```
 
 ### 2.4. Comparing fitted Lasso and OLS coefficients:
@@ -151,16 +165,15 @@ barplot(rbind(coefs_ols, coefs_min@x), xlab='Gene Coefficients', col=c("darkblue
 abline(h=0)
 ```
 
-We can see how the coefficients for the OLS model are larger than for Lasso, which is to be expected since there is no shrinkage involved. In the following chunck we can see a breakdown of the OLS model, where we can see how all predictive variables are statistically significant, but the adjusted $R^2$ is around 0.25, indicating that this model explains a low amount of the variance in the dataset.
+We can see how the coefficients for the OLS model are larger than for Lasso, which is to be expected since there is no shrinkage involved. In fact the coefficient for the *5352* gene was almost 0 in the Lasso model (0.0034) but now in the OLS it has a statistically significant amount, with a value of 0.447. In the following chunck we can see a breakdown of the OLS model, where we can see how all predictive variables are statistically significant, but the adjusted $R^2$ is around 0.25, indicating that this model explains a low amount of the variance in the dataset.
 
 ```{r}
 summary(ols_model)
 ```
 
-What happens now with the predictions? They are, optically, somewhat better to those produced by the Lasso model, and indeed we can see a tendency, albeit a weak one, between the predictions and the sample data.
+In the following plot we show a comparison between the OLS fitted values and the Lasso fitted values, where we can see a nice tendency. We can also see how the Lasso predicts lower amounts for the points then the OLS, which is completely expected given the shrinkage of the coefficients involved.
 
 ```{r}
-Y_hat_ols <- predict(ols_model, newx = expr)
-plot(log.surv, Y_hat_ols, asp=1)
+plot(Y_hat_ols, Y_hat, asp=1)
 abline(a=0,b=1,col=2)
 ```
