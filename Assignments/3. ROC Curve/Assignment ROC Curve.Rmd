@@ -77,9 +77,8 @@ Total nospam data (4/9) -> 1440
 We select these data randomly and make the splits. Randomness is only performed in the first pick.
 
 ```{r}
-set.seed(123)
+set.seed(1234)
 no_spam <- no_spam_all[sample(nrow(no_spam_all), n_no_spam), ]
-set.seed(321)
 spam <- spam_all[sample(nrow(spam_all), n_spam), ]
 
 midpoint_nospam <- floor(nrow(no_spam) / 2)
@@ -113,6 +112,22 @@ print("Proportion of spam e-mails = "); print(round(mean(df_test.01),4))
 
 
 ```
+
+```{r, include=FALSE}
+# simple solution using the caret package
+library(caret)
+set.seed(1234)
+
+trainIndex <- createDataPartition(
+  spam.01,
+  times=1,
+  p=2/3,
+  list=FALSE
+)
+cat(paste("Proportion of training spam e-mails =",round(mean(spam.01[trainIndex]),2),sep=""))
+cat(paste("Proportion of training spam e-mails =",round(mean(spam.01[-trainIndex]),2),sep=""))
+```
+
 Logistic regression fitted by maximum  likelihood (glm)
 
 
