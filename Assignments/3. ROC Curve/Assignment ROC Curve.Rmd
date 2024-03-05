@@ -1,53 +1,50 @@
 ---
-title: 'Assignment 3: Comparing discriminant rules. ROC curve and other methods'
+title: "3. ROC Curve"
 author: "Víctor Villegas, Roger Llorenç, Luis Sierra"
 date: "2024-03-05"
-output:
-  pdf_document: default
-  html_document: default
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Loading the necessary libraries and datasets. 
+### 1. Read the SPAM dataset
 
 ```{r}
+spam <- read.table("spambase/spambase.data",sep=",")
 
+spam.names <- c(read.table("spambase/spambase.names",sep=":",skip=33,nrows=53,as.is=TRUE)[,1],
+                "char_freq_#",
+                read.table("spambase/spambase.names",sep=":",skip=87,nrows=3,as.is=TRUE)[,1],
+                "spam.01")
 
-# no sé si s'han d'escalar les dades o no... (no ho fet jo) 
-# GLM i GLMNET coincideixen al 100% i no sé si això és una bona senyal...
-# S'han de canviar els paths 
+names(spam) <- spam.names 
 
-while (dev.cur() != 1) {
-  dev.off()
-}
-# Clears global environment
-rm(list=ls())
+n<-dim(spam)[1]
+p<-dim(spam)[2]-1
 
-library(wrapr)
-library(glmnet)
-library(class)
-library(pROC)
+spam.01 <- spam[,p+1]
+spam.vars <- as.matrix(spam[,1:p])
 
-path_1 <- ("C:/Users/Roger/Documents/3_UPC/1_Master_math/9_statistical_learning/5_spam_email_database/spambase.data")
-df <- read.table(path_1,sep=",")
+cat(paste("n = ", n, ', p = ', p,sep=""))
+cat(paste("Proportion of spam e-mails =", round(mean(spam.01), 2), sep=""))
 
-path_2 <- ("C:/Users/Roger/Documents/3_UPC/1_Master_math/9_statistical_learning/5_spam_email_database/spambase.NAMES")
-df.names <- c(read.table(path_2,sep=":",skip=33,nrows=53,as.is=TRUE)[,1],
-              "char_freq_#",
-              read.table(path_2,sep=":",skip=87,nrows=3,as.is=TRUE)[,1],
-              "spam.01")
-names(df) <- df.names # Adds headers to the df
+glm.spam <- glm(spam.01 ~ spam.vars,family=binomial)
+# summary(glm.spam)
 
-
-
-spam_all <- df[df[, dim(df)[2]] == 1, ] # We have 1813 spam
-no_spam_all <- df[df[, dim(df)[2]] == 0, ] # We have 2788 no-spam 
 ```
 
-Traning/test data split
+### 2. Train-Test partioning of the data
+
+The manual way to create a train-test split is shown below.
+
+Note the composition of the data, which can be divided as follows:
+
+4601 initial data split into train (2/3) -> 3068 and test (1/3) -> 1533
+spam_train (2/3) -> 1209 and nospam_train (2/3) -> 1859
+spam_test (1/3) -> 604 and nospam_test (1/3) -> 929
+
 
 ```{r}
 set.seed(1234)
@@ -61,53 +58,20 @@ trainIndex <- union(nospamTrain, spamTrain)
 
 trainData <- spam[trainIndex,]
 testData <- spam[-trainIndex,]
+
+n <- dim(trainData)[1]
+p <- dim(trainData)[2] - 1
+
+Y <- scale(trainData[,p+1], center=FALSE, scale=FALSE)
+X <- scale(trainData[,1:p], center=TRUE, scale=TRUE)
 ```
 
 
-```{r}
-a = floor(dim(spam_all)[1]/3)*2;
-b = floor(dim(no_spam_all)[1]/3)
-
-set.seed(123)
-aa = sample(a);
-set.seed(123)
-bb = sample(b)
-
-spam_train = spam_all[aa, ]; spam_test = spam_all[setdiff(1:dim(spam_all)[1], aa), ]
-no_spam_train = no_spam_all[bb, ]; no_spam_test = no_spam_all[setdiff(1:dim(no_spam_all)[1], bb), ]
-
-```
-
-```{r}
-
-df_tr <- rbind.data.frame(no_spam_train, spam_train)
-
-n<-dim(df_tr)[1]
-p<-dim(df_tr)[2]-1 # Removes last column (response variable)
-df_tr.01 <- df_tr[,p+1] # That is, the binary response variable
-df_tr.vars <- as.matrix(df_tr[,1:p]) # That is X (n x p)
-print("n_train = ");print(n);
-print("p_train = ");print(p);
-print("Proportion of spam e-mails = "); print(round(mean(df_tr.01),4))
-
-df_test <- rbind.data.frame(no_spam_test, spam_test)
-
-ntest<-dim(df_test)[1]
-ptest<-dim(df_test)[2]-1 # Removes last column (response variable)
-df_test.01 <- df_test[,p+1] # That is, the binary response variable
-df_test.vars <- as.matrix(df_test[,1:p]) # That is X (n x p)
-print("n_test = ");print(ntest);
-print("p_test = ");print(ptest);
-print("Proportion of spam e-mails = "); print(round(mean(df_test.01),4))
-
-
-
-
-```
 
 ```{r, include=FALSE}
-# simple solution using the caret package
+# using the caret package
 library(caret)
+
 set.seed(1234)
 
 trainIndex <- createDataPartition(
@@ -120,45 +84,28 @@ cat(paste("Proportion of training spam e-mails =",round(mean(spam.01[trainIndex]
 cat(paste("Proportion of training spam e-mails =",round(mean(spam.01[-trainIndex]),2),sep=""))
 ```
 
-Logistic regression fitted by maximum  likelihood (glm)
+### 3. Classification rules
+
+We now consider three methods to obtain classification rules: logistic regression via maximum likelihood, logistic regression via Lasso, and $k$-nearest neighbors.
+
+Starting with logistic regression via maximum likelihood:
 
 ```{r}
+glm.logistic <- glm(spam.01 ~ ., data = as.data.frame(trainData), family = binomial())
 
-glm.df_tr <- glm(df_tr.01 ~ ., data = as.data.frame(df_tr.vars), family = binomial())
+predictions_glm <- predict(glm.logistic, newdata = testData[,1:p], type = "response")
 
-predictions_glm <- predict(glm.df_tr, newdata = as.data.frame(df_test.vars), type = "response")
-
-roc_curve_glm <- roc(df_test.01, predictions_glm)
-plot(roc_curve_glm, main = "ROC Curve", col = "blue")
-
-predicted_classes_glm <- ifelse(predictions_glm >= 0.5, 1, 0)
-misclassification_rate_glm <- mean(predicted_classes_glm != df_test.01)
-print("missclassification rate for GLM ussing c = 1/2: "); print(misclassification_rate_glm)
-
-
-l_val_glm_store = numeric(dim(df_test)[1])
-
-for (j in 1:dim(df_test)[1]){
-  aux1 = df_test.01[j] * log(predictions_glm[j])
-  aux2 = (1-df_test.01[j]) * log(1- predictions_glm[j])
-  l_val_glm_store[j] = aux1 + aux2
-  if (is.nan(aux1) | is.nan(aux2) | l_val_glm_store[j] == -Inf ) {
-    l_val_glm_store[j] = 0
-  }
-  
-}
-l_val_glm = mean(l_val_glm_store)
-
+#summary(glm.logistic)
 ```
 
-Logistic regression fitted by Lasso (glmnet)
+Lasso GLM:
 
 ```{r}
+library(glmnet)
+set.seed(1234)
 
-set.seed(234) # To ensure replicability
-
-fit_lasso <- glmnet(df_tr.vars, df_tr.01, family = "binomial")
-cvfit_lasso = cv.glmnet(df_tr.vars, df_tr.01, family = "binomial", type.measure = "class")
+fit_lasso <- glmnet(X, Y, family = "binomial")
+cvfit_lasso = cv.glmnet(X, Y, family = "binomial", type.measure = "class")
 
 plot(fit_lasso, xvar = "dev", label = TRUE)
 plot(cvfit_lasso)
@@ -166,23 +113,96 @@ plot(cvfit_lasso)
 ```
 
 ```{r}
+final_fit_lasso <- glmnet(trainData[,1:p], trainData$spam.01, family = "binomial", lambda = cvfit_lasso$lambda.min)
+newx <- model.matrix(testData$spam.01 ~ ., data=testData[,1:p])
+predictions_lasso <- predict(final_fit_lasso, newx = newx[,-1], type = "response")
+```
 
-final_fit_lasso <- glmnet(df_tr.vars, df_tr.01, family = "binomial", lambda = cvfit_lasso$lambda.min)
+$k$-nearest neighbours:
 
-predictions_lasso <- predict(final_fit_lasso, newx = df_test.vars, type = "response")
+```{r}
+set.seed(1234)
 
-roc_curve_lasso <- roc(df_test.01, predictions_lasso)
-plot(roc_curve_lasso, main = "ROC Curve", col = "blue")
+trainData$spam.01 <- as.factor(trainData$spam.01)
+ctrl <- trainControl(method="repeatedcv",repeats = 3)
+knn_fit <- train(spam.01 ~ .,
+             method     = "knn",
+             tuneGrid   = expand.grid(k = 1:20),
+             trControl  = ctrl,
+             data       = trainData)
+knn_fit$bestTune # 
+```
+
+The best performing value for $k$ was $k=1$.
+
+```{r}
+predictions_knn <- predict(knn_fit, newdata = testData)
+testData$spam.01 <- as.factor(testData$spam.01)
+confusionMatrix(predictions_knn, testData$spam.01)
+```
+
+
+### 4. ROC Curves
+
+Using the test data we find the following ROC curves:
+
+```{r}
+library(pROC)
+
+# glm ROC
+roc_curve_glm <- roc(testData[,p+1], predictions_glm)
+plot(roc_curve_glm, main = "ROC Curve", col = "blue", title="Classic GLM")
+
+# Lasso ROC
+roc_curve_lasso <- roc(testData[,p+1], predictions_lasso)
+plot(roc_curve_lasso, main = "ROC Curve", col = "blue", title="Lasso GLM")
+
+# knn ROC
+roc_curve_knn <- roc(testData[,p+1], as.numeric(as.character(predictions_knn)))
+plot(roc_curve_knn, main = "ROC Curve", col = "blue", title="Knn fit")
+```
+
+### 5. Misclassification Rate at $c=\frac{1}{2}$
+
+```{r}
+predicted_classes_glm <- ifelse(predictions_glm >= 0.5, 1, 0)
+misclassification_rate_glm <- mean(predicted_classes_glm != testData$spam.01)
+
+cat(paste("missclassification rate for GLM using c = 1/2:",misclassification_rate_glm,sep=" "))
+
 
 predicted_classes_lasso <- ifelse(predictions_lasso >= 0.5, 1, 0)
-misclassification_rate_lasso <- mean(predicted_classes_lasso != df_test.01)
-print("missclassification rate for LASSO ussing c = 1/2: "); print(misclassification_rate_lasso)
+misclassification_rate_lasso <- mean(predicted_classes_lasso != testData$spam.01)
+cat(paste("missclassification rate for Lasso using c = 1/2:",misclassification_rate_lasso,sep=" "))
 
-l_val_lasso_store = numeric(dim(df_test)[1])
+predicted_classes_knn <- ifelse(as.numeric(as.character(predictions_knn)) >= 0.5, 1, 0)
+misclassification_rate_knn <- mean(predicted_classes_knn != testData$spam.01)
+cat(paste("missclassification rate for 1-nn using c = 1/2:",misclassification_rate_knn,sep=" "))
+```
 
-for (j in 1:dim(df_test)[1]){
-  aux1 = df_test.01[j] * log(predictions_lasso[j])
-  aux2 = (1-df_test.01[j]) * log(1- predictions_lasso[j])
+### 6. Calculating $\ell_{val}$
+
+```{r}
+l_val_glm_store <- numeric(dim(testData)[1])
+
+for (j in 1:dim(testData)[1]){
+  aux1 = as.numeric(testData$spam.01[j]) * log(predictions_glm[j])
+  aux2 = (1-as.numeric(testData$spam.01[j])) * log(1-predictions_glm[j])
+  l_val_glm_store[j] = aux1 + aux2
+  if (is.nan(aux1) | is.nan(aux2) | l_val_glm_store[j] == -Inf ) {
+    l_val_glm_store[j] = 0
+  }
+  
+}
+l_val_glm <- mean(l_val_glm_store)
+
+###
+
+l_val_lasso_store = numeric(dim(testData)[1])
+
+for (j in 1:dim(testData)[1]){
+  aux1 = as.numeric(testData$spam.01[j]) * log(predictions_lasso[j])
+  aux2 = (1-as.numeric(testData$spam.01[j])) * log(1- predictions_lasso[j])
   l_val_lasso_store[j] = aux1 + aux2
   if (is.nan(aux1) | is.nan(aux2) | l_val_lasso_store[j] == -Inf ) {
     l_val_lasso_store[j] = 0
@@ -190,89 +210,17 @@ for (j in 1:dim(df_test)[1]){
   
 }
 
-l_val_lasso = mean(l_val_lasso_store)
+l_val_lasso <- mean(l_val_lasso_store)
 
-```
+###
 
-```{r}
+preds <- as.numeric(as.character(predictions_knn))
 
-cvfit_lasso$lambda.min
-coefs_min_lasso <- coef(cvfit_lasso, s = "lambda.min")
+l_val_knn_store <- numeric(dim(testData)[1])
 
-print("The coefficients sorted by impact for lambda_{min} are: ")
-coefs_min_lasso_aux = coefs_min_lasso[-1,]
-coefs_min_lasso_aux[order(abs(coefs_min_lasso_aux))]
-
-```
-
-From these observations, we can observe which predictors are related to NO spam (negative ones)
-and the ones related to spam (positive ones) and ordered.
-The most relevant predictors to detect NO spam are: "george", "meeting", "george", "hp"
-The most relevant predictors to detect spam are: "$", "000", "money", "!"
-Some discarded predictors are: "mail", "receive", "addresses" and "telnet"
-
-
-```{r}
-
-cvfit_lasso$lambda.1se
-coefs_min_lasso <- coef(cvfit_lasso, s = "lambda.1se")
-
-print("The coefficients sorted by impact for lambda_{min} are: ")
-coefs_min_lasso_aux = coefs_min_lasso[-1,]
-coefs_min_lasso_aux[order(abs(coefs_min_lasso_aux))]
-
-```
-
-From these observations, we can observe which predictors are related to NO spam (negative ones)
-and the ones related to spam (positive ones) and ordered.
-The most relevant predictors to detect NO spam are: "data", "conference", "meeting", "hp"
-The most relevant predictors to detect spam are: "$", "!", "remove", "000"
-Some discarded predictors are: "make", "all", "3d" and "address"
-
-k-nn binary regression (class)
-
-```{r}
-
-k_vec = c(1, 2, 5, 10, 20, 50, 100) # Rule of thumb (sqrt(n)) ~=50 so we pick 50...
-
-for(j in 1:length(k_vec)){
-  set.seed(555)
-  knn_fit <- knn(train = df_tr.vars, test = df_tr.vars, cl = df_tr.01, k = k_vec[j])
-  knn_cv <- knn.cv(train = df_tr.vars, cl = df_tr.01, k = k_vec[j])
-  
-  predictions_knn <- knn(train = df_tr.vars, test = df_test.vars, cl = df_tr.01, k = k_vec[j])
-  predictions_knn <- as.integer(as.character(predictions_knn))
-
-  roc_curve_knn <- roc(df_test.01, predictions_knn)
-  plot(roc_curve_knn, main = "ROC Curve", col = "blue")
-  
-  predicted_classes_knn <- ifelse(predictions_knn >= 0.5, 1, 0)
-  misclassification_rate_knn <- mean(predicted_classes_knn != df_test.01)
-  print("missclassification rate for LASSO ussing c = 1/2 and k = : ");print(k_vec[j]);
-  print("is: "); print(misclassification_rate_knn )
-}
-
-k = 50
-set.seed(555)
-knn_fit <- knn(train = df_tr.vars, test = df_tr.vars, cl = df_tr.01, k = k)
-knn_cv <- knn.cv(train = df_tr.vars, cl = df_tr.01, k = k_vec[j])
-
-predictions_knn <- knn(train = df_tr.vars, test = df_test.vars, cl = df_tr.01, k = k)
-predictions_knn <- as.integer(as.character(predictions_knn))
-
-roc_curve_knn <- roc(df_test.01, predictions_knn)
-plot(roc_curve_knn, main = "ROC Curve", col = "blue")
-
-predicted_classes_knn <- ifelse(predictions_knn >= 0.5, 1, 0)
-misclassification_rate_knn <- mean(predicted_classes_knn != df_test.01)
-print("missclassification rate for LASSO ussing c = 1/2 and k = : ");print(k);
-  print("is: "); print(misclassification_rate_knn )
-
-l_val_knn_store = numeric(dim(df_test)[1])
-
-for (j in 1:dim(df_test)[1]){
-  aux1 = df_test.01[j] * log(predictions_knn[j])
-  aux2 = (1-df_test.01[j]) * log(1- predictions_knn[j])
+for (j in 1:dim(testData)[1]){
+  aux1 = as.numeric(testData$spam.01[j]) * log(preds[j])
+  aux2 = (1-as.numeric(testData$spam.01[j])) * log(1-preds[j])
   l_val_knn_store[j] = aux1 + aux2
   if (is.nan(aux1) | is.nan(aux2) | l_val_knn_store[j] == -Inf ) {
     l_val_knn_store[j] = 0
@@ -280,9 +228,12 @@ for (j in 1:dim(df_test)[1]){
   
 }
 
-l_val_knn = mean(l_val_knn_store)
-
+l_val_knn <- mean(l_val_knn_store)
 ```
 
-
+```{r}
+cat(paste("l_val for classical GLM",l_val_glm,sep=" "))
+cat(paste("l_val for Lasso GLM",l_val_lasso,sep=" "))
+cat(paste("l_val for 1-nn",l_val_knn,sep=" "))
+```
 
