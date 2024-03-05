@@ -122,26 +122,7 @@ cat(paste("Proportion of training spam e-mails =",round(mean(spam.01[-trainIndex
 
 Logistic regression fitted by maximum  likelihood (glm)
 
-
 ```{r}
-
-# One variable by one
-
-for (j in 1:dim(df_tr.vars)[2]) {
-  aux0 <- as.numeric(df_tr.vars[, j])
-  perm <- orderv(list(aux0))
-  aux1 <- aux0[perm]
-  aux2 <- df_tr.01[perm]
-  glm.df_tr <- glm(aux2 ~ aux1,family=binomial())
-  # summary(glm.df_tr)
-  plot(aux1,aux2,xlab = df.names[j], ylab="Spam")
-  lines(aux1, glm.df_tr$fitted.values,col=4)
-
-}
-
-```
-```{r}
-# General (ns com funciona la veritat...)
 
 glm.df_tr <- glm(df_tr.01 ~ ., data = as.data.frame(df_tr.vars), family = binomial())
 
