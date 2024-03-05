@@ -256,7 +256,7 @@ for(j in 1:length(k_vec)){
   
   predicted_classes_knn <- ifelse(predictions_knn >= 0.5, 1, 0)
   misclassification_rate_knn <- mean(predicted_classes_knn != df_test.01)
-  print("missclassification rate for LASSO ussing c = 1/2 and k = to : ");print(k_vec[j]);
+  print("missclassification rate for LASSO ussing c = 1/2 and k = : ");print(k_vec[j]);
   print("is: "); print(misclassification_rate_knn )
 
 
@@ -275,7 +275,7 @@ plot(roc_curve_knn, main = "ROC Curve", col = "blue")
 
 predicted_classes_knn <- ifelse(predictions_knn >= 0.5, 1, 0)
 misclassification_rate_knn <- mean(predicted_classes_knn != df_test.01)
-print("missclassification rate for LASSO ussing c = 1/2 and k = to : ");print(k);
+print("missclassification rate for LASSO ussing c = 1/2 and k = : ");print(k);
   print("is: "); print(misclassification_rate_knn )
 
 ```
