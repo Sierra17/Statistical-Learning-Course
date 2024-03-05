@@ -15,15 +15,10 @@ Loading the necessary libraries and datasets.
 
 ```{r}
 
-# mmmmm això és el q tinc fet... 
-# cap garantia de que estigui bé... 
-# he fet l'split de les dades com se m'ha acudit... 
+
 # no sé si s'han d'escalar les dades o no... (no ho fet jo) 
 # GLM i GLMNET coincideixen al 100% i no sé si això és una bona senyal...
-# Falta l'exercici 6 que va dir a classe què era però no ho recordo...
 # S'han de canviar els paths 
-# Els comentaris del LASSO de quin són els que afecten més etc ho podem treure...
-# I alguna cosa més volia dir però no se m'acut ara
 
 while (dev.cur() != 1) {
   dev.off()
@@ -52,7 +47,7 @@ spam_all <- df[df[, dim(df)[2]] == 1, ] # We have 1813 spam
 no_spam_all <- df[df[, dim(df)[2]] == 0, ] # We have 2788 no-spam 
 ```
 
-Separating the data
+Traning/test data split
 
 ```{r}
 set.seed(1234)
@@ -162,7 +157,6 @@ print("missclassification rate for GLM ussing c = 1/2: "); print(misclassificati
 
 l_val_glm_store = numeric(dim(df_test)[1])
 
-
 for (j in 1:dim(df_test)[1]){
   aux1 = df_test.01[j] * log(predictions_glm[j])
   aux2 = (1-df_test.01[j]) * log(1- predictions_glm[j])
@@ -172,21 +166,9 @@ for (j in 1:dim(df_test)[1]){
   }
   
 }
-
-
-
 l_val_glm = mean(l_val_glm_store)
 
-
-
-
 ```
-
-
-
-
-
-
 
 Logistic regression fitted by Lasso (glmnet)
 
@@ -201,6 +183,7 @@ plot(fit_lasso, xvar = "dev", label = TRUE)
 plot(cvfit_lasso)
 
 ```
+
 ```{r}
 
 final_fit_lasso <- glmnet(df_tr.vars, df_tr.01, family = "binomial", lambda = cvfit_lasso$lambda.min)
@@ -214,9 +197,7 @@ predicted_classes_lasso <- ifelse(predictions_lasso >= 0.5, 1, 0)
 misclassification_rate_lasso <- mean(predicted_classes_lasso != df_test.01)
 print("missclassification rate for LASSO ussing c = 1/2: "); print(misclassification_rate_lasso)
 
-
 l_val_lasso_store = numeric(dim(df_test)[1])
-
 
 for (j in 1:dim(df_test)[1]){
   aux1 = df_test.01[j] * log(predictions_lasso[j])
@@ -228,25 +209,12 @@ for (j in 1:dim(df_test)[1]){
   
 }
 
-
-
 l_val_lasso = mean(l_val_lasso_store)
-
-
-
-
-
-
-
-
 
 ```
 
-AFEGIT --> ES POT TREURE...
-
-
-
 ```{r}
+
 cvfit_lasso$lambda.min
 coefs_min_lasso <- coef(cvfit_lasso, s = "lambda.min")
 
@@ -255,6 +223,7 @@ coefs_min_lasso_aux = coefs_min_lasso[-1,]
 coefs_min_lasso_aux[order(abs(coefs_min_lasso_aux))]
 
 ```
+
 From these observations, we can observe which predictors are related to NO spam (negative ones)
 and the ones related to spam (positive ones) and ordered.
 The most relevant predictors to detect NO spam are: "george", "meeting", "george", "hp"
@@ -263,6 +232,7 @@ Some discarded predictors are: "mail", "receive", "addresses" and "telnet"
 
 
 ```{r}
+
 cvfit_lasso$lambda.1se
 coefs_min_lasso <- coef(cvfit_lasso, s = "lambda.1se")
 
@@ -278,12 +248,9 @@ The most relevant predictors to detect NO spam are: "data", "conference", "meeti
 The most relevant predictors to detect spam are: "$", "!", "remove", "000"
 Some discarded predictors are: "make", "all", "3d" and "address"
 
-
-
 k-nn binary regression (class)
 
 ```{r}
-
 
 k_vec = c(1, 2, 5, 10, 20, 50, 100) # Rule of thumb (sqrt(n)) ~=50 so we pick 50...
 
@@ -302,8 +269,6 @@ for(j in 1:length(k_vec)){
   misclassification_rate_knn <- mean(predicted_classes_knn != df_test.01)
   print("missclassification rate for LASSO ussing c = 1/2 and k = : ");print(k_vec[j]);
   print("is: "); print(misclassification_rate_knn )
-
-
 }
 
 k = 50
@@ -324,7 +289,6 @@ print("missclassification rate for LASSO ussing c = 1/2 and k = : ");print(k);
 
 l_val_knn_store = numeric(dim(df_test)[1])
 
-
 for (j in 1:dim(df_test)[1]){
   aux1 = df_test.01[j] * log(predictions_knn[j])
   aux2 = (1-df_test.01[j]) * log(1- predictions_knn[j])
@@ -335,10 +299,7 @@ for (j in 1:dim(df_test)[1]){
   
 }
 
-
-
 l_val_knn = mean(l_val_knn_store)
-
 
 ```
 
