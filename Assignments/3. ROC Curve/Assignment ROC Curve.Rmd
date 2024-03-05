@@ -52,6 +52,22 @@ spam_all <- df[df[, dim(df)[2]] == 1, ] # We have 1813 spam
 no_spam_all <- df[df[, dim(df)[2]] == 0, ] # We have 2788 no-spam 
 ```
 
+Separating the data
+
+```{r}
+set.seed(1234)
+
+spamIndex <- which(spam.01 %in% c(1))
+nospamIndex <- which(spam.01 %in% c(0))
+
+spamTrain <- sample(spamIndex, size = ceiling(2/3*length(spamIndex)))
+nospamTrain <- sample(nospamIndex, size = ceiling(2/3*length(nospamIndex)))
+trainIndex <- union(nospamTrain, spamTrain)
+
+trainData <- spam[trainIndex,]
+testData <- spam[-trainIndex,]
+```
+
 
 ```{r}
 a = floor(dim(spam_all)[1]/3)*2;
