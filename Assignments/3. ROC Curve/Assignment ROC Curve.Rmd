@@ -53,40 +53,21 @@ no_spam_all <- df[df[, dim(df)[2]] == 0, ] # We have 2788 no-spam
 ```
 
 
-Preparing the datasets. 
-
-We want to divide data into two parts: 2/3 for the training sample, 1/3 for the test sample, such that 2/3 are SPAM in training and also in test. This leads to 5/9 of the data will be SPAM and 4/9 NO-SPAM.
-
-We have 2788 SPAM and 1813 NO-SPAM observations. We  select a number of SPAM observations of such that it is
-multiple of 9,4,5 because of the ratios, that is smaller than 2788 (obviously), that 4/9 is smaller than 1813 and that is an integer so that partitions are exact. That is to solve for a: a*4*5*9 < 1813
-
 ```{r}
-a = floor(dim(spam_all)[1]/(4*5*9))
-n_spam = a*9*4*5; n_no_spam = n_spam *(4/9)/(5/9)
-print("spam observations"); print(n_spam); print("no-spam observations"); print(n_no_spam)
+a = floor(dim(spam_all)[1]/3)*2;
+b = floor(dim(no_spam_all)[1]/3)
+
+set.seed(123)
+aa = sample(a);
+set.seed(123)
+bb = sample(b)
+
+spam_train = spam_all[aa, ]; spam_test = spam_all[setdiff(1:dim(spam_all)[1], aa), ]
+no_spam_train = no_spam_all[bb, ]; no_spam_test = no_spam_all[setdiff(1:dim(no_spam_all)[1], bb), ]
+
 ```
-We will work with: 
-
-3240 initial data split into train (2/3) -> 2160 and test (1/3) -> 1080
-spam_train (2/3) -> 1440 and nospam_train (1/3) -> 720
-spam_test (1/3) -> 360 and nospam_test (2/3) -> 720
-
-Total spam data (5/9) -> 1800
-Total nospam data (4/9) -> 1440
-
-We select these data randomly and make the splits. Randomness is only performed in the first pick.
 
 ```{r}
-set.seed(1234)
-no_spam <- no_spam_all[sample(nrow(no_spam_all), n_no_spam), ]
-spam <- spam_all[sample(nrow(spam_all), n_spam), ]
-
-midpoint_nospam <- floor(nrow(no_spam) / 2)
-no_spam_train <- no_spam[1:midpoint_nospam, ]; no_spam_test <- no_spam[(midpoint_nospam + 1):nrow(no_spam), ]
-
-partition_spam <- floor(nrow(spam) *8 / 10)
-spam_train <- spam[1:partition_spam, ]; spam_test <- spam[(partition_spam + 1):nrow(spam), ]
-
 
 df_tr <- rbind.data.frame(no_spam_train, spam_train)
 
