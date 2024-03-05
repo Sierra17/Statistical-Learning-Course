@@ -194,16 +194,20 @@ predicted_classes_lasso <- ifelse(predictions_lasso >= 0.5, 1, 0)
 misclassification_rate_lasso <- mean(predicted_classes_lasso != df_test.01)
 print("missclassification rate for LASSO ussing c = 1/2: "); print(misclassification_rate_lasso)
 
+
 l_val_lasso = 0;
+l_val_lasso_store = numeric(dim(df_test)[1])
 
 
 for (j in 1:dim(df_test)[1]){
   aux1 = df_test.01[j] * log(predictions_lasso[j])
   aux2 = (1-df_test.01[j]) * log(1- predictions_lasso[j])
-  l_val_lasso = l_val_lasso + aux1 + aux2
+  l_val_lasso_store[j] = aux1 + aux2
 }
 
-l_val_lasso = l_val_lasso/length(df_test.01)
+l_val_lasso = mean(l_val_lasso_store)
+
+
 
 
 
