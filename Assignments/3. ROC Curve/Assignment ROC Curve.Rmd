@@ -213,9 +213,9 @@ coefs_min_lasso_aux[order(abs(coefs_min_lasso_aux))]
 ```
 From these observations, we can observe which predictors are related to NO spam (negative ones)
 and the ones related to spam (positive ones) and ordered.
-The most relevant predictors to detect NO spam are: "george", "conference", "cs", "meeting"
-The most relevant predictors to detect spam are: "$", "remove", "000", "money"
-Some discarded predictors are: "857", "415", "capital_run_length_total" and "capital_run_length_longest"
+The most relevant predictors to detect NO spam are: "george", "meeting", "george", "hp"
+The most relevant predictors to detect spam are: "$", "000", "money", "!"
+Some discarded predictors are: "mail", "receive", "addresses" and "telnet"
 
 
 ```{r}
@@ -230,9 +230,9 @@ coefs_min_lasso_aux[order(abs(coefs_min_lasso_aux))]
 
 From these observations, we can observe which predictors are related to NO spam (negative ones)
 and the ones related to spam (positive ones) and ordered.
-The most relevant predictors to detect NO spam are: "cs", "conference", "meeting", "hp"
-The most relevant predictors to detect spam are: "$", "remove", "000", "money"
-Some discarded predictors are: "make", "all", "mail" and "addresses"
+The most relevant predictors to detect NO spam are: "data", "conference", "meeting", "hp"
+The most relevant predictors to detect spam are: "$", "!", "remove", "000"
+Some discarded predictors are: "make", "all", "3d" and "address"
 
 
 
