@@ -203,9 +203,18 @@ for (j in 1:dim(df_test)[1]){
   aux1 = df_test.01[j] * log(predictions_lasso[j])
   aux2 = (1-df_test.01[j]) * log(1- predictions_lasso[j])
   l_val_lasso_store[j] = aux1 + aux2
+  if (l_val_lasso_store[j] == -Inf| l_val_lasso_store[j] == Inf ) {
+    l_val_lasso_store[j] = 0
+  }
+  
 }
 
+
+
 l_val_lasso = mean(l_val_lasso_store)
+
+
+
 
 
 
