@@ -136,6 +136,11 @@ knn_fit$bestTune #
 The best performing value for $k$ was $k=1$.
 
 ```{r}
+knn_fit
+plot(knn_fit, print.thres = 0.5, type="S")
+```
+
+```{r}
 predictions_knn <- predict(knn_fit, newdata = testData)
 testData$spam.01 <- as.factor(testData$spam.01)
 confusionMatrix(predictions_knn, testData$spam.01)
