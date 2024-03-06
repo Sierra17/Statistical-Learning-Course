@@ -209,7 +209,7 @@ for (j in 1:dim(testData)[1]){
   aux1 = as.numeric(testData$spam.01[j]) * log(predictions_lasso[j])
   aux2 = (1-as.numeric(testData$spam.01[j])) * log(1- predictions_lasso[j])
   l_val_lasso_store[j] = aux1 + aux2
-  if (is.nan(aux1) | is.nan(aux2) | l_val_lasso_store[j] == -Inf ) {
+  if (is.nan(aux1) | is.nan(aux2) | l_val_lasso_store[j] == -Inf | aux2 == Inf) {
     l_val_lasso_store[j] = 0
   }
   
@@ -227,7 +227,7 @@ for (j in 1:dim(testData)[1]){
   aux1 = as.numeric(testData$spam.01[j]) * log(preds[j])
   aux2 = (1-as.numeric(testData$spam.01[j])) * log(1-preds[j])
   l_val_knn_store[j] = aux1 + aux2
-  if (is.nan(aux1) | is.nan(aux2) | l_val_knn_store[j] == -Inf ) {
+  if (is.nan(aux1) | is.nan(aux2) | l_val_knn_store[j] == -Inf | l_val_knn_store[j] == Inf) {
     l_val_knn_store[j] = 0
   }
   
