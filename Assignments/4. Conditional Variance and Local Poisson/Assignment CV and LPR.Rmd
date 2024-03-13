@@ -1,0 +1,59 @@
+---
+title: 'Assignment 5: Conditional Variance and Local Poisson'
+author: "Víctor Villegas, Roger Llorenç, Luis Sierra"
+date: "2024-03-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Conditional Variance
+
+Loading the necessary library and dataset. Storing the logarithm transform of the variables.
+
+```{r}
+library(sm)
+data(aircraft)
+help(aircraft)
+attach(aircraft)
+lgPower <- log(Power)
+lgSpan <- log(Span)
+lgLength <- log(Length)
+lgWeight <- log(Weight)
+lgSpeed <- log(Speed)
+lgRange <- log(Range)
+```
+
+We consider a heteroscedastic regression model $Y = m(X) + \sigma(X)\varepsilon$ for $\varepsilon$ the standard, zero-mean Gaussian noise.
+
+## 1.1. Nonparametric regression model on the original data
+
+```{r}
+# Function loc.pol.reg option
+source("locpolreg.R")
+aircraft.lp_reg <- locpolreg(Yr, lgWeight)
+```
+
+```{r}
+# Function sm.regression option
+aircraft.sm_reg <- sm.regression(Yr, lgWeight)
+```
+
+## 1.2. Transformed estimated residuals
+
+```{r}
+
+```
+
+# 2. Local Poisson Regression
+
+## 2.1. Bandwidth choice
+
+## 2.2. Local Poisson regression for Country Development
+
+```{r}
+data <- read.csv2('HDI.2017.subset.csv')
+```
+
