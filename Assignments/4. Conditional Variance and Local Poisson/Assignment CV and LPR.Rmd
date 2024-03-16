@@ -28,6 +28,10 @@ lgRange <- log(Range)
 
 We consider a heteroscedastic regression model $Y = m(X) + \sigma(X)\varepsilon$ for $\varepsilon$ the standard, zero-mean Gaussian noise.
 
+```{r}
+plot(Yr, lgWeight)
+```
+
 ## 1.1. Nonparametric regression model on the original data
 
 ```{r}
@@ -38,7 +42,9 @@ aircraft.lp_reg <- locpolreg(Yr, lgWeight)
 
 ```{r}
 # Function sm.regression option
-aircraft.sm_reg <- sm.regression(Yr, lgWeight)
+library(KernSmooth)
+h <- dpill(Yr, lgWeight)
+aircraft.sm_reg <- sm.regression(Yr, lgWeight, h)
 ```
 
 ## 1.2. Transformed estimated residuals
