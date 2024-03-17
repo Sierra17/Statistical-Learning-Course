@@ -14,6 +14,15 @@ knitr::opts_chunk$set(echo = TRUE)
 Loading the necessary library and dataset. Storing the logarithm transform of the variables.
 
 ```{r}
+
+# Clears plots
+while (dev.cur() != 1) {
+  dev.off()
+}
+# Clears global environment
+rm(list=ls())
+
+
 library(sm)
 data(aircraft)
 help(aircraft)
@@ -37,21 +46,136 @@ plot(Yr, lgWeight)
 ```{r}
 # Function loc.pol.reg option
 source("locpolreg.R")
-aircraft.lp_reg <- locpolreg(Yr, lgWeight)
+
+# Leave-one-out CV to select bandwidth
+h.cv.gcv <- function(x,y,h.v = exp(seq(log(diff(range(x))/20),
+                                       log(diff(range(x))/4),l=10)), 
+                     p=1,type.kernel="normal"){
+  n <- length(x)
+  cv <- h.v*0
+  gcv <- h.v*0
+  for (i in (1:length(h.v))){
+    h <- h.v[i]
+    aux <- locpolreg(x=x,y=y,h=h,p=p,tg=x,
+                     type.kernel=type.kernel, doing.plot=FALSE)
+    S <- aux$S
+    h.y <- aux$mtgr
+    hii <- diag(S)
+    av.hii <- mean(hii)
+    cv[i] <- sum(((y-h.y)/(1-hii))^2)/n
+    gcv[i] <- sum(((y-h.y)/(1-av.hii))^2)/n
+  }
+  return(list(h.v=h.v,cv=cv,gcv=gcv))
+}
+```
+
+```{r}
+
+h.v <-  exp(seq(from=log(1), to = log(20), length=30))
+out.h.cv <- h.cv.gcv(x=aircraft$Yr, y=lgWeight, h.v=h.v)
+h.loo.cv <- h.v[which.min(out.h.cv$cv)]
+
+```
+
+```{r}
+
+plot(h.v,out.h.cv$cv, xlab ="bandwidth", ylab = "mean ssr")
+lines(h.v,out.h.cv$cv)
+abline(v = h.loo.cv, col = "red") 
+
+aircraft.lp_reg <-locpolreg(x=aircraft$Yr,y=lgWeight,h=h.loo.cv)
+
 ```
 
 ```{r}
 # Function sm.regression option
 library(KernSmooth)
-h <- dpill(Yr, lgWeight)
-aircraft.sm_reg <- sm.regression(Yr, lgWeight, h)
+
+h2 <- dpill(x=aircraft$Yr,y=lgWeight,gridsize=length(aircraft$Yr),range.x=range(aircraft$Yr))
+set.seed(123)
+aircraft.sm_reg <- sm.regression(x = aircraft$Yr, y = lgWeight, h = h2, eval.points = seq(min(aircraft$Yr), max(aircraft$Yr), length.out = length(aircraft$Yr)))
+
 ```
 
 ## 1.2. Transformed estimated residuals
 
 ```{r}
+# Function loc.pol.reg option
+residualss1 <- lgWeight - aircraft.lp_reg$mtgr
+z_i1 = log(residualss1^2)
+h.v_z <-  exp(seq(from=log(1), to = log(30), length=30))
+
+out.h.cv_z <- h.cv.gcv(x=aircraft$Yr, y=z_i1, h.v=h.v_z)
+h.loo.cv_z <- h.v[which.min(out.h.cv_z$cv)]
 
 ```
+
+
+```{r}
+plot(h.v_z,out.h.cv_z$cv, xlab ="bandwidht", ylab = "mean ssr")
+lines(h.v_z,out.h.cv_z$cv)
+abline(v = h.loo.cv_z, col = "red") 
+```
+
+```{r}
+q_hat1 = locpolreg(x=aircraft$Yr,y = z_i1,h = h.loo.cv_z)
+```
+
+
+```{r}
+
+sigma_square_hat1 = exp(q_hat1$mtgr)
+
+
+plot(aircraft$Yr, residualss1^2, col = rgb(0, 0, 0, alpha = 0.4), xlab = "x", ylab = "e_i^2")
+lines(aircraft$Yr, sigma_square_hat1, col = "red", lwd = 3)  # Adjust line width here
+
+# Your plot code
+plot_aux <- locpolreg(x=aircraft$Yr,y=lgWeight,h=h.loo.cv)
+lines(aircraft$Yr, aircraft.lp_reg$mtgr, type = "l", col = "blue")
+lines(aircraft$Yr, aircraft.lp_reg$mtgr + 1.96 * sqrt(sigma_square_hat1), col = "red")
+lines(aircraft$Yr, aircraft.lp_reg$mtgr - 1.96 * sqrt(sigma_square_hat1), col = "red")
+grid(col = "gray", lty = "dotted")  # Add grid
+
+# Add legend with adjusted parameters
+legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"), 
+       col = c(rgb(0, 0, 0, alpha = 0.5), "blue", "red"), lty = c(NA, 1, 1), 
+       pch = c(1, NA, NA), cex = 0.6)
+
+```
+
+```{r}
+# Function sm.regression option
+residualss2 <- lgWeight - aircraft.sm_reg$estimate
+z_i2 = log(residualss2^2)
+
+h.dpill_zi2 <- dpill(x=aircraft$Yr,y=z_i2,gridsize=length(aircraft$Yr),range.x=range(aircraft$Yr))
+
+q_hat2 = sm.regression(x = aircraft$Yr, y = z_i2, h = h.dpill_zi2, eval.points = seq(min(aircraft$Yr), max(aircraft$Yr), length.out = length(aircraft$Yr)))
+
+sigma_square_hat2 = exp(q_hat2$estimate)
+
+
+plot(aircraft$Yr, residualss2^2, col = rgb(0, 0, 0, alpha = 0.4), xlab = "x", ylab = "e_i^2")
+lines(aircraft$Yr, sigma_square_hat2, col = "red", lwd = 3)  # Adjust line width here
+
+# Your plot code
+set.seed(123)
+plot_aux_2 <- sm.regression(x = aircraft$Yr, y = lgWeight, h = h2, eval.points = seq(min(aircraft$Yr), max(aircraft$Yr), length.out = length(aircraft$Yr)))
+# plot(aircraft$Yr, lgWeight, col = rgb(0, 0, 0, alpha = 0.5), xlab = "x", ylab = "m_hat")
+lines(aircraft$Yr, aircraft.sm_reg$estimate, type = "l", col = "blue")
+lines(aircraft$Yr, aircraft.sm_reg$estimate + 1.96 * sqrt(sigma_square_hat2), col = "red")
+lines(aircraft$Yr, aircraft.sm_reg$estimate - 1.96 * sqrt(sigma_square_hat2), col = "red")
+grid(col = "gray", lty = "dotted")  # Add grid
+
+# Add legend with adjusted parameters
+legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"), 
+       col = c(rgb(0, 0, 0, alpha = 0.5), "blue", "red"), lty = c(NA, 1, 1), 
+       pch = c(1, NA, NA), cex = 0.6)
+
+
+```
+
 
 # 2. Local Poisson Regression
 
