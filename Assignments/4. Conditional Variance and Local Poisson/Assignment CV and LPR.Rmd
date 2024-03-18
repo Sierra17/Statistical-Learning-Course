@@ -1,5 +1,5 @@
 ---
-title: 'Assignment 5: Conditional Variance and Local Poisson'
+title: 'Assignment 4: Conditional Variance and Local Poisson'
 author: "Víctor Villegas, Roger Llorenç, Luis Sierra"
 date: "2024-03-19"
 output: html_document
@@ -11,7 +11,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # 1. Conditional Variance
 
-Loading the necessary library and dataset. Storing the logarithm transform of the variables.
+We are using *Aircraft data*, from the R library `sm`. These data record the following characteristics of aircraft designs.
+
+-   `Yr`
+-   `Period`
+-   `Power`
+-   `Span`
+-   `Length`
+-   `Weight`
+-   `Speed`
+-   `Range`
+
+We begin by loading the library and transforming the data taking logs (except for `Yr` and `Period`).
 
 ```{r}
 
@@ -37,11 +48,15 @@ lgRange <- log(Range)
 
 We consider a heteroscedastic regression model $Y = m(X) + \sigma(X)\varepsilon$ for $\varepsilon$ the standard, zero-mean Gaussian noise.
 
+We are going to estimate the conditional variance of `lgWeight` ($Y$) given `Yr` ($x$). We can see the evolution of the (log) weight of the airships over the years in the following plot.
+
 ```{r}
 plot(Yr, lgWeight)
 ```
 
 ## 1.1. Nonparametric regression model on the original data
+
+### Option 1: using `loc.pol.reg`
 
 ```{r}
 # Function loc.pol.reg option
@@ -87,6 +102,8 @@ aircraft.lp_reg <-locpolreg(x=aircraft$Yr,y=lgWeight,h=h.loo.cv)
 
 ```
 
+### Option 2: using `sm.regression`
+
 ```{r}
 # Function sm.regression option
 library(KernSmooth)
@@ -94,7 +111,6 @@ library(KernSmooth)
 h2 <- dpill(x=aircraft$Yr,y=lgWeight,gridsize=length(aircraft$Yr),range.x=range(aircraft$Yr))
 set.seed(123)
 aircraft.sm_reg <- sm.regression(x = aircraft$Yr, y = lgWeight, h = h2, eval.points = seq(min(aircraft$Yr), max(aircraft$Yr), length.out = length(aircraft$Yr)))
-
 ```
 
 ## 1.2. Transformed estimated residuals
@@ -110,7 +126,6 @@ h.loo.cv_z <- h.v[which.min(out.h.cv_z$cv)]
 
 ```
 
-
 ```{r}
 plot(h.v_z,out.h.cv_z$cv, xlab ="bandwidht", ylab = "mean ssr")
 lines(h.v_z,out.h.cv_z$cv)
@@ -120,7 +135,6 @@ abline(v = h.loo.cv_z, col = "red")
 ```{r}
 q_hat1 = locpolreg(x=aircraft$Yr,y = z_i1,h = h.loo.cv_z)
 ```
-
 
 ```{r}
 
@@ -176,7 +190,6 @@ legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"),
 
 ```
 
-
 # 2. Local Poisson Regression
 
 ## 2.1. Bandwidth choice
@@ -186,4 +199,3 @@ legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"),
 ```{r}
 data <- read.csv2('HDI.2017.subset.csv')
 ```
-
