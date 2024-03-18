@@ -115,6 +115,8 @@ aircraft.sm_reg <- sm.regression(x = aircraft$Yr, y = lgWeight, h = h2, eval.poi
 
 ## 1.2. Transformed estimated residuals
 
+### Option 1: using `loc.pol.reg`
+
 ```{r}
 # Function loc.pol.reg option
 residualss1 <- lgWeight - aircraft.lp_reg$mtgr
@@ -127,7 +129,7 @@ h.loo.cv_z <- h.v[which.min(out.h.cv_z$cv)]
 ```
 
 ```{r}
-plot(h.v_z,out.h.cv_z$cv, xlab ="bandwidht", ylab = "mean ssr")
+plot(h.v_z,out.h.cv_z$cv, xlab ="bandwidth", ylab = "mean ssr")
 lines(h.v_z,out.h.cv_z$cv)
 abline(v = h.loo.cv_z, col = "red") 
 ```
@@ -157,6 +159,8 @@ legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"),
        pch = c(1, NA, NA), cex = 0.6)
 
 ```
+
+### Option 2: using `sm.regression`
 
 ```{r}
 # Function sm.regression option
