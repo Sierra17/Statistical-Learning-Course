@@ -52,7 +52,7 @@ locpolreg <- function(x,y,h=quantile(dist(x),.25),q=1,r=0,tg=NULL,type.kernel="n
       if (r==0){
         if (nosubplot) par(mfrow=c(1,1))
         plot(x,y,col="grey",...)
-        lines(sorted.tg,mtgr[sorted.tg.ix],col=1,lwd=2)
+        lines(sorted.tg,mtgr[sorted.tg.ix],col="blue",lwd=2)
       } 
       else{
          par(mfrow=c(2,1))

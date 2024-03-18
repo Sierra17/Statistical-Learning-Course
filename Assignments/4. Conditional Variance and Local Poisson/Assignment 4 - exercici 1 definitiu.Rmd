@@ -1,0 +1,278 @@
+---
+title: 'Assignment 4: Conditional Variance and Local Poisson'
+author: "Víctor Villegas, Roger Llorenç, Luis Sierra"
+date: "2024-03-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Conditional Variance
+
+We are using *Aircraft data*, from the R library `sm`. These data record the following characteristics of aircraft designs.
+
+-   `Yr`
+-   `Period`
+-   `Power`
+-   `Span`
+-   `Length`
+-   `Weight`
+-   `Speed`
+-   `Range`
+
+We begin by loading the library and transforming the data taking logs (except for `Yr` and `Period`).
+
+```{r}
+# Clears plots
+while (dev.cur() != 1) {
+  dev.off()
+}
+# Clears global environment
+rm(list=ls())
+
+library(sm)
+data(aircraft)
+help(aircraft)
+attach(aircraft)
+
+lgPower <- log(Power)
+lgSpan <- log(Span)
+lgLength <- log(Length)
+lgWeight <- log(Weight)
+lgSpeed <- log(Speed)
+lgRange <- log(Range)
+```
+
+We consider a heteroscedastic regression model $Y = m(X) + \sigma(X)\varepsilon$ for $\varepsilon$ the standard, zero-mean Gaussian noise.
+
+We are going to estimate the conditional variance of `lgWeight` ($Y$) given `Yr` ($x$). We can see the evolution of the (log) weight of the airships over the years in the following plot.
+
+```{r}
+plot(Yr, lgWeight, cex = 0.6, xlab="Year", ylab = "log Weight")
+```
+
+## Option 2: using `sm.regression`
+
+### 1.1. Nonparametric regression model on the original data
+
+We'll call the estimated function $\hat m(x)$ and save the estimated values in `m_hat`.
+
+```{r}
+library(KernSmooth)
+
+x <- aircraft$Yr
+y <- lgWeight
+h_sm <- dpill(x, y)
+aircraft.sm_reg <- sm.regression(x, y, h_sm, 
+                                 eval.points =seq(min(x), max(x), length.out=length(x)),
+                                 xlab = "Year", ylab = "log ",
+                                 lwd=2, col="blue", cex=0.5)
+
+legend("topleft", legend = "m_hat", col = "blue", lty = 1, lwd=2)
+
+m_hat = aircraft.sm_reg$estimate
+```
+
+### 1.2. Transformed estimated residuals
+
+```{r}
+epsilon_hat <- y - m_hat
+z <- log(epsilon_hat^2)
+```
+
+### 1.3. Nonparametric regression model on the $(x_i,z_i)$
+
+We'll call the estimated function $\hat q(x)$ and save the estimated values in `q_hat`.
+
+The function $\hat q(x)$ is an estimate of $\log\sigma^2(x)$.
+
+```{r}
+h2_sm <- dpill(x, z)
+aircraft.sm_reg2 <- sm.regression(x, z, h2_sm, 
+                                 eval.points =seq(min(x), max(x), length.out=length(x)),
+                                 ylim = c(min(z), 5),
+                                 xlab = "Year", ylab = "log Squared est. residuals",
+                                 lwd=2, col="blue", cex=0.5)
+
+legend("topleft", legend = "q_hat", col = "blue", lty = 1, lwd=2)
+
+q_hat = aircraft.sm_reg2$estimate
+```
+
+### 1.4. Estimate $\sigma^2(x)$
+
+We estimate it by $\hat\sigma^2(x)=e^{\hat q(x)}$ and save the estimated values in `sigma_square_hat`
+
+```{r}
+sigma_square_hat = exp(q_hat)
+```
+
+### Plots
+
+#### Draw a graphic of $\hat\epsilon_i^2$ against $x_i$ and superimpose the estimated function $\hat\sigma^2(s)$.
+
+```{r}
+year.points = aircraft.sm_reg$eval.points
+
+# Plot squared residuals against xi
+plot(year.points, epsilon_hat^2, xlab = "Year", ylab = "Squared est. residuals", col="grey", cex=0.7)
+
+# Superimpose the estimated function sigma_square_hat
+lines(year.points, sigma_square_hat, col = "blue",lwd=1.5)
+
+legend("topleft", legend = "sigma_square_hat", col = "blue", lty = 1, cex = 0.8,lwd=1.5)
+```
+
+#### Draw the function $\hat m(x)$ and superimpose the bands $\hat m(x) \pm 1.96\hat\sigma(x)$.
+
+```{r}
+
+# Plot the estimate m_hat
+plot(x, y, xlab = "Year", ylab = "log Weight", col="grey", cex = 0.7)
+lines(year.points, m_hat, type = "l", col = "blue", lwd=1.5)
+
+# Superimpose the estimated function sigma_square_hat
+lines(year.points, m_hat + 1.96 * sqrt(sigma_square_hat), col = "red", lty=2, lwd=1.5)
+lines(year.points, m_hat - 1.96 * sqrt(sigma_square_hat), col = "red", lty=2, lwd=1.5)
+
+# Add legend with adjusted parameters
+legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"), 
+       col = c("grey", "blue", "red"), 
+       lty = c(NA, 1, 2), pch = c(1, NA, NA), lwd = 1.5, cex = 0.8)
+
+```
+
+## Option 1: using `loc.pol.reg`
+
+### 1.1. Nonparametric regression model on the original data
+
+We'll call the estimated function $\hat m(x)$ and save the estimated values in `m_hat`.
+
+```{r}
+source("locpolreg.R")
+
+# Leave-one-out CV to select bandwidth
+h.cv.gcv <- function(x,y,h.v = exp(seq(log(diff(range(x))/20),
+                                    log(diff(range(x))/4),l=10)), 
+                     p=1,type.kernel="normal"){
+  n <- length(x)
+  cv <- h.v*0
+  gcv <- h.v*0
+  for (i in (1:length(h.v))){
+    h <- h.v[i]
+    aux <- locpolreg(x=x,y=y,h=h,p=p,tg=x,
+                     type.kernel=type.kernel, doing.plot=FALSE)
+    S <- aux$S
+    h.y <- aux$mtgr
+    hii <- diag(S)
+    av.hii <- mean(hii)
+    cv[i] <- sum(((y-h.y)/(1-hii))^2)/n
+    gcv[i] <- sum(((y-h.y)/(1-av.hii))^2)/n
+  }
+  return(list(h.v=h.v,cv=cv,gcv=gcv))
+}
+```
+
+```{r}
+x = aircraft$Yr
+y = lgWeight
+
+h.v <-  exp(seq(from=log(1), to = log(20), length=30))
+out.h.cv <- h.cv.gcv(x, y, h.v=h.v)
+h.loo.cv <- h.v[which.min(out.h.cv$cv)]
+
+```
+
+```{r}
+
+plot(h.v,out.h.cv$cv, xlab ="bandwidth", ylab = "mean ssr")
+lines(h.v,out.h.cv$cv)
+abline(v = h.loo.cv, col = "red") 
+
+aircraft.lp_reg <-locpolreg(x, y,h=h.loo.cv,
+                                 xlab = "Year", ylab = "log Weight")
+
+legend("topleft", legend = "m_hat", col = "blue", lty = 1, lwd=2)
+
+m_hat = aircraft.lp_reg$mtgr
+```
+
+### 1.2. Transformed estimated residuals
+
+```{r}
+epsilon_hat <- y - m_hat
+z <- log(epsilon_hat^2)
+```
+
+### 1.3. Nonparametric regression model on the $(x_i,z_i)$
+
+We'll call the estimated function $\hat q(x)$ and save the estimated values in `q_hat`.
+
+The function $\hat q(x)$ is an estimate of $\log\sigma^2(x)$.
+
+```{r}
+h.v_z <-  exp(seq(from=log(1), to = log(30), length=30))
+
+out.h.cv_z <- h.cv.gcv(x, y=z, h.v=h.v_z)
+h.loo.cv_z <- h.v[which.min(out.h.cv_z$cv)]
+
+plot(h.v_z,out.h.cv_z$cv, xlab ="bandwidth", ylab = "mean ssr")
+lines(h.v_z,out.h.cv_z$cv)
+abline(v = h.loo.cv_z, col = "red") 
+```
+
+```{r}
+aircraft.lp_reg2 = locpolreg(x, z, h = h.loo.cv_z,
+                                 ylim = c(min(z), 5),
+                                 xlab = "Year", ylab = "log Squared est. residuals")
+
+legend("topleft", legend = "q_hat", col = "blue", lty = 1, lwd=2)
+
+q_hat = aircraft.lp_reg2$mtgr
+```
+
+### 1.4. Estimate $\sigma^2(x)$
+
+We estimate it by $\hat\sigma^2(x)=e^{\hat q(x)}$ and save the estimated values in `sigma_square_hat`
+
+```{r}
+sigma_square_hat = exp(q_hat)
+```
+
+### Plots
+
+#### Draw a graphic of $\hat\epsilon_i^2$ against $x_i$ and superimpose the estimated function $\hat\sigma^2(s)$.
+
+```{r}
+plot(x, epsilon_hat^2, xlab = "Year", ylab = "Squared est. residuals", col="grey", cex=0.7)
+lines(x, sigma_square_hat, col = "blue",lwd=1.5)
+```
+
+#### Draw the function $\hat m(x)$ and superimpose the bands $\hat m(x) \pm 1.96\hat\sigma(x)$.
+
+```{r}
+plot_aux <- locpolreg(x, y ,h=h.loo.cv, xlab = "Year", ylab = "log Weight", cex = 0.7)
+lines(x, m_hat, type = "l", col = "blue")
+
+lines(x, m_hat + 1.96 * sqrt(sigma_square_hat), col = "red", lty=2, lwd=1.5)
+lines(x, m_hat - 1.96 * sqrt(sigma_square_hat), col = "red", lty=2, lwd=1.5)
+grid(col = "gray", lty = "dotted")  # Add grid
+
+# Add legend with adjusted parameters
+legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"), 
+       col = c("grey", "blue", "red"), 
+       lty = c(NA, 1, 2), pch = c(1, NA, NA), lwd = 1.5, cex = 0.8)
+
+```
+
+# 2. Local Poisson Regression
+
+## 2.1. Bandwidth choice
+
+## 2.2. Local Poisson regression for Country Development
+
+```{r}
+data <- read.csv2('HDI.2017.subset.csv')
+```
