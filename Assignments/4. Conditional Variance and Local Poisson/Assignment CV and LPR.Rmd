@@ -95,7 +95,7 @@ h.loocv <- h.v[which.min(out.h.cv$cv)]
 
 #### Option 2: using `sm.regression`
 
- ```{r}
+```{r}
 # Function sm.regression option
 library(KernSmooth)
 h_m <- dpill(Yr, lgWeight)
@@ -123,7 +123,7 @@ aircraft.sm_reg2 <- sm.regression(Yr, z.sm, h2_sm,
                                  eval.points = seq(min(Yr), max(Yr), length.out = length(Yr)),
                                  ylim = c(min(z.sm), 5),
                                  xlab = "Year", ylab = "log Squared est. residuals",
-                                 lwd = 2, col = "blue", cex = 0.5)
+                                 lwd = 2, col = "blue", cex = 0.7)
 
 q_hat = aircraft.sm_reg2$estimate
 
@@ -146,7 +146,7 @@ sigma_square_hat = exp(q_hat)
 year.points = aircraft.sm_reg$eval.points
 
 # Plot squared residuals against x_i
-plot(year.points, epsilon.sm^2, xlab = "Year", ylab = "Squared est. residuals", col = "grey", cex = 0.7)
+plot(year.points, epsilon.sm, xlab = "Year", ylab = "Squared est. residuals", col = "grey", cex = 0.7)
 
 # Superimpose the estimated function sigma_square_hat
 lines(year.points, sigma_square_hat, col = "blue",lwd = 1.5)
