@@ -95,11 +95,12 @@ h.loocv <- h.v[which.min(out.h.cv$cv)]
 
 #### Option 2: using `sm.regression`
 
-```{r}
+ ```{r}
 # Function sm.regression option
 library(KernSmooth)
 h_m <- dpill(Yr, lgWeight)
-aircraft.sm_reg <- sm.regression(Yr, lgWeight, h_m, eval.points = seq(min(Yr), max(Yr), length.out = length(Yr)))
+aircraft.sm_reg <- sm.regression(Yr, lgWeight, h_m,
+                  eval.points = seq(min(Yr), max(Yr), length.out = length(Yr)))
 ```
 
 ## 1.2. Transformed estimated residuals
