@@ -106,64 +106,6 @@ aircraft.lp_reg <-locpolreg(x=aircraft$Yr,y=lgWeight,h=h.loo.cv)
 
 ```{r}
 # Function sm.regression option
-library(KernSmooth)
-
-h2 <- dpill(x=aircraft$Yr,y=lgWeight,gridsize=length(aircraft$Yr),range.x=range(aircraft$Yr))
-set.seed(123)
-aircraft.sm_reg <- sm.regression(x = aircraft$Yr, y = lgWeight, h = h2, eval.points = seq(min(aircraft$Yr), max(aircraft$Yr), length.out = length(aircraft$Yr)))
-```
-
-## 1.2. Transformed estimated residuals
-
-### Option 1: using `loc.pol.reg`
-
-```{r}
-# Function loc.pol.reg option
-residualss1 <- lgWeight - aircraft.lp_reg$mtgr
-z_i1 = log(residualss1^2)
-h.v_z <-  exp(seq(from=log(1), to = log(30), length=30))
-
-out.h.cv_z <- h.cv.gcv(x=aircraft$Yr, y=z_i1, h.v=h.v_z)
-h.loo.cv_z <- h.v[which.min(out.h.cv_z$cv)]
-
-```
-
-```{r}
-plot(h.v_z,out.h.cv_z$cv, xlab ="bandwidth", ylab = "mean ssr")
-lines(h.v_z,out.h.cv_z$cv)
-abline(v = h.loo.cv_z, col = "red") 
-```
-
-```{r}
-q_hat1 = locpolreg(x=aircraft$Yr,y = z_i1,h = h.loo.cv_z)
-```
-
-```{r}
-
-sigma_square_hat1 = exp(q_hat1$mtgr)
-
-
-plot(aircraft$Yr, residualss1^2, col = rgb(0, 0, 0, alpha = 0.4), xlab = "x", ylab = "e_i^2")
-lines(aircraft$Yr, sigma_square_hat1, col = "red", lwd = 3)  # Adjust line width here
-
-# Your plot code
-plot_aux <- locpolreg(x=aircraft$Yr,y=lgWeight,h=h.loo.cv)
-lines(aircraft$Yr, aircraft.lp_reg$mtgr, type = "l", col = "blue")
-lines(aircraft$Yr, aircraft.lp_reg$mtgr + 1.96 * sqrt(sigma_square_hat1), col = "red")
-lines(aircraft$Yr, aircraft.lp_reg$mtgr - 1.96 * sqrt(sigma_square_hat1), col = "red")
-grid(col = "gray", lty = "dotted")  # Add grid
-
-# Add legend with adjusted parameters
-legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"), 
-       col = c(rgb(0, 0, 0, alpha = 0.5), "blue", "red"), lty = c(NA, 1, 1), 
-       pch = c(1, NA, NA), cex = 0.6)
-
-```
-
-### Option 2: using `sm.regression`
-
-```{r}
-# Function sm.regression option
 residualss2 <- lgWeight - aircraft.sm_reg$estimate
 z_i2 = log(residualss2^2)
 
