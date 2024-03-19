@@ -228,7 +228,7 @@ is estimated via maximum likelihood on the hyperparameter `h`.
 # Function to estimate the log-likelihood of a Poisson distribution
 # via cross-validation
 loglik.CV.poisson <- function(X, Y, h){
-  n <- length(X) - 1
+  n <- length(X)
   pred <- sapply(1:n, 
                  function(i, X, Y, h){
                    sm.poisson(x = X[-i], y = Y[-i], h = h, eval.points = X[i],
@@ -250,9 +250,7 @@ h.cv.sm.poisson <- function(X, Y, h.range=NULL, l.h=10, method=loglik.CV.poisson
   gr.h <- exp(seq(log(h.range[1]), log(h.range[2]), l = l.h))
   for (h in gr.h) {
     i <- i + 1
-    cat("**************")
     cv.h[i] <- method(X, Y, h)
-    cat("++++++++++++")
   }
   return(list(h = gr.h,
               cv.h = cv.h, 
