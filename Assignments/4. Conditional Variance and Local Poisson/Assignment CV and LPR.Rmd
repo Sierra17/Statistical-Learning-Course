@@ -194,6 +194,113 @@ legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"),
 
 ```
 
+# 1. Conditional Variance
+
+Loading the necessary library and dataset. Storing the logarithm transform of the variables.
+
+```{r}
+library(sm)
+data(aircraft)
+help(aircraft)
+attach(aircraft)
+lgPower <- log(Power)
+lgSpan <- log(Span)
+lgLength <- log(Length)
+lgWeight <- log(Weight)
+lgSpeed <- log(Speed)
+lgRange <- log(Range)
+```
+
+We consider a heteroscedastic regression model $Y = m(X) + \sigma(X)\varepsilon$ for $\varepsilon$ being standard, zero-mean Gaussian noise.
+
+```{r}
+plot(Yr, lgWeight)
+```
+
+## 1.1. Nonparametric regression model on the original data
+
+```{r}
+# Function loc.pol.reg option
+source("locpolreg.R")
+aircraft.lp_reg <- locpolreg(Yr, lgWeight)
+```
+
+```{r}
+# Function sm.regression option
+library(KernSmooth)
+h_m <- dpill(Yr, lgWeight)
+aircraft.sm_reg <- sm.regression(Yr, lgWeight, h_m, eval.points = seq(min(Yr), max(Yr), length.out = length(Yr)))
+```
+
+## 1.2. Transformed estimated residuals
+
+```{r}
+yhat.sm <- aircraft.sm_reg$estimate
+epsilon.sm <- (lgWeight - yhat.sm)^2
+z.sm <- log(epsilon.sm)
+```
+
+## 1.3. Nonparametric regression model for $(x_i,z_i)$
+
+We'll call the estimated function $\hat q(x)$ and save the estimated values in `q_hat`.
+
+The function $\hat q(x)$ is an estimate of $\log\sigma^2(x)$.
+
+```{r}
+h2_sm <- dpill(Yr, z.sm)
+aircraft.sm_reg2 <- sm.regression(Yr, z.sm, h2_sm, 
+                                 eval.points =seq(min(Yr), max(Yr), length.out=length(Yr)),
+                                 ylim = c(min(z.sm), 5),
+                                 xlab = "Year", ylab = "log Squared est. residuals",
+                                 lwd=2, col="blue", cex=0.5)
+
+legend("topleft", legend = "q_hat", col = "blue", lty = 1, lwd=2)
+
+q_hat = aircraft.sm_reg2$estimate
+```
+
+### 1.4. Estimating $\sigma^2(x)$
+
+We shall estimate the variance by $\hat\sigma^2(x)=e^{\hat q(x)}$ and save the estimated values in `sigma_square_hat`
+
+```{r}
+sigma_square_hat = exp(q_hat)
+```
+
+### Plots
+
+#### Draw a graph of $\hat\epsilon_i^2$ against $x_i$ and superimpose the estimated function $\hat\sigma^2(s)$.
+
+```{r}
+year.points = aircraft.sm_reg$eval.points
+
+# Plot squared residuals against x_i
+plot(year.points, epsilon.sm^2, xlab = "Year", ylab = "Squared est. residuals", col="grey", cex=0.7)
+
+# Superimpose the estimated function sigma_square_hat
+lines(year.points, sigma_square_hat, col = "blue",lwd=1.5)
+
+legend("topleft", legend = "sigma_square_hat", col = "blue", lty = 1, cex = 0.8,lwd=1.5)
+```
+
+#### Draw the function $\hat m(x)$ and superimpose the bands $\hat m(x) \pm 1.96\hat\sigma(x)$.
+
+```{r}
+
+# Plot the estimate m_hat
+plot(Yr, lgWeight, xlab = "Year", ylab = "log Weight", col="grey", cex = 0.7)
+lines(year.points, yhat.sm, type = "l", col = "blue", lwd=1.5)
+
+# Superimpose the estimated function sigma_square_hat
+lines(year.points, yhat.sm + 1.96 * sqrt(sigma_square_hat), col = "red", lty=2, lwd=1.5)
+lines(year.points, yhat.sm - 1.96 * sqrt(sigma_square_hat), col = "red", lty=2, lwd=1.5)
+
+# Add legend with adjusted parameters
+legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"), 
+       col = c("grey", "blue", "red"), 
+       lty = c(NA, 1, 2), pch = c(1, NA, NA), lwd = 1.5, cex = 0.8)
+
+```
 
 # 2. Local Poisson Regression
 
