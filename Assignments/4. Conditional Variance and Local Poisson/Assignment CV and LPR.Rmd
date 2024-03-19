@@ -140,9 +140,9 @@ We shall estimate the variance by $\hat\sigma^2(x)=e^{\hat q(x)}$ and save the e
 sigma_square_hat = exp(q_hat)
 ```
 
-### Plots
+## Plots
 
-#### Draw a graph of $\hat\epsilon_i^2$ against $x_i$ and superimpose the estimated function $\hat\sigma^2(s)$.
+**Draw a graph of** $\hat\epsilon_i^2$ **against** $x_i$ **and superimpose the estimated function** $\hat\sigma^2(s)$**.**
 
 ```{r}
 year.points = aircraft.sm_reg$eval.points
@@ -156,7 +156,7 @@ lines(year.points, sigma_square_hat, col = "blue",lwd = 1.5)
 legend("topleft", legend = "sigma_square_hat", col = "blue", lty = 1, cex = 0.8, lwd = 1.5)
 ```
 
-#### Draw the function $\hat m(x)$ and superimpose the bands $\hat m(x) \pm 1.96\hat\sigma(x)$.
+**Draw the function** $\hat m(x)$ **and superimpose the bands** $\hat m(x) \pm 1.96\hat\sigma(x)$**.**
 
 ```{r}
 
