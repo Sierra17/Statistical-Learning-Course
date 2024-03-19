@@ -111,7 +111,7 @@ sigma_square_hat = exp(q_hat)
 
 ### Plots
 
-#### Draw a graphic of $\hat\epsilon_i^2$ against $x_i$ and superimpose the estimated function $\hat\sigma^2(s)$.
+**Draw a graphic of** $\hat\epsilon_i^2$ **against** $x_i$ **and superimpose the estimated function** $\hat\sigma^2(s)$**.**
 
 ```{r}
 year.points = aircraft.sm_reg$eval.points
@@ -125,7 +125,7 @@ lines(year.points, sigma_square_hat, col = "blue",lwd=1.5)
 legend("topleft", legend = "sigma_square_hat", col = "blue", lty = 1, cex = 0.8,lwd=1.5)
 ```
 
-#### Draw the function $\hat m(x)$ and superimpose the bands $\hat m(x) \pm 1.96\hat\sigma(x)$.
+**Draw the function** $\hat m(x)$ **and superimpose the bands** $\hat m(x) \pm 1.96\hat\sigma(x)$**.**
 
 ```{r}
 
@@ -243,14 +243,14 @@ sigma_square_hat = exp(q_hat)
 
 ### Plots
 
-#### Draw a graphic of $\hat\epsilon_i^2$ against $x_i$ and superimpose the estimated function $\hat\sigma^2(s)$.
+**Draw a graphic of** $\hat\epsilon_i^2$ **against** $x_i$ **and superimpose the estimated function** $\hat\sigma^2(s)$**.**
 
 ```{r}
 plot(x, epsilon_hat^2, xlab = "Year", ylab = "Squared est. residuals", col="grey", cex=0.7)
 lines(x, sigma_square_hat, col = "blue",lwd=1.5)
 ```
 
-#### Draw the function $\hat m(x)$ and superimpose the bands $\hat m(x) \pm 1.96\hat\sigma(x)$.
+**Draw the function** $\hat m(x)$ **and superimpose the bands** $\hat m(x) \pm 1.96\hat\sigma(x)$**.**
 
 ```{r}
 plot_aux <- locpolreg(x, y ,h=h.loo.cv, xlab = "Year", ylab = "log Weight", cex = 0.7)

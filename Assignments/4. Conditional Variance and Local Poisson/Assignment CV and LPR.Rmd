@@ -3,8 +3,8 @@ title: 'Assignment 4: Conditional Variance and Local Poisson'
 author: "Víctor Villegas, Roger Llorenç, Luis Sierra"
 date: "2024-03-19"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
