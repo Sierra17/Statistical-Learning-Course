@@ -2,7 +2,9 @@
 title: 'Assignment 4: Conditional Variance and Local Poisson'
 author: "Víctor Villegas, Roger Llorenç, Luis Sierra"
 date: "2024-03-19"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -173,7 +175,6 @@ legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"),
 
 ```
 
-
 # 2. Local Poisson Regression
 
 Using the dataset from `HDI.2017.subset.csv` for the Human Development Index of nations.
@@ -186,21 +187,24 @@ data <- read.csv2('HDI.2017.subset.csv')
 
 We modify the functions `loglik.CV` and `h.cv.sm.binomial`to obtain a bandwidth choice method for local Poisson regression based on LOOCV for the expected likelihood. To do so, we will be using the log-likelihood
 
+```{=tex}
 \begin{equation*}
 l_{cv}(h) = \frac{1}{n}\sum^n_{i=1} log {(\hat{Pr}_h^{-i}(Y=y_i | X=x_i))},
 \end{equation*}
-
+```
 where $\hat{Pr}_h^{-i}(Y=y_i | X=x_i)$ is an estimate for
-\begin{equation*}
-{Pr}(Y=y_i | X=x_i) = e^{-\lambda_i}\frac{\lambda_i^{y_i}}{y_i!}, 
-\end{equation*}
+
+$$
+{Pr}(Y=y_i | X=x_i) = e^{-\lambda_i}\frac{\lambda_i^{y_i}}{y_i!},
+$$
 
 where of course
 
+```{=tex}
 \begin{equation*}
 \lambda_i = \mathbb{E}\left[Y|X=x_i\right]
 \end{equation*}
-
+```
 is estimated via maximum likelihood on the hyperparameter `h`.
 
 ```{r}
