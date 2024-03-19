@@ -194,12 +194,87 @@ legend("topleft", legend = c("Data", "m_hat", "Confidence Interval"),
 
 ```
 
+
 # 2. Local Poisson Regression
 
-## 2.1. Bandwidth choice
-
-## 2.2. Local Poisson regression for Country Development
+Using the dataset from `HDI.2017.subset.csv` for the Human Development Index of nations.
 
 ```{r}
 data <- read.csv2('HDI.2017.subset.csv')
 ```
+
+## 2.1. Bandwidth choice
+
+We modify the functions `loglik.CV` and `h.cv.sm.binomial`to obtain a bandwidth choice method for local Poisson regression based on LOOCV for the expected likelihood. To do so, we will be using the log-likelihood
+
+\begin{equation*}
+l_{cv}(h) = \frac{1}{n}\sum^n_{i=1} log {(\hat{Pr}_h^{-i}(Y=y_i | X=x_i))},
+\end{equation*}
+
+where $\hat{Pr}_h^{-i}(Y=y_i | X=x_i)$ is an estimate for
+\begin{equation*}
+{Pr}(Y=y_i | X=x_i) = e^{-\lambda_i}\frac{\lambda_i^{y_i}}{y_i!}, 
+\end{equation*}
+
+where of course
+
+\begin{equation*}
+\lambda_i = \mathbb{E}\left[Y|X=x_i\right]
+\end{equation*}
+
+is estimated via maximum likelihood on the hyperparameter `h`.
+
+```{r}
+# Function to estimate the log-likelihood of a Poisson distribution
+# via cross-validation
+loglik.CV.poisson <- function(X, Y, h){
+  n <- length(X) - 1
+  pred <- sapply(1:n, 
+                 function(i, X, Y, h){
+                   sm.poisson(x = X[-i], y = Y[-i], h = h, eval.points = X[i],
+                              display = "none")$estimate
+                 },   X, Y, h)
+  like <- exp(-pred)*(pred^Y)/factorial(Y)
+  return(mean(log(like)))
+}
+
+
+h.cv.sm.poisson <- function(X, Y, h.range=NULL, l.h=10, method=loglik.CV.poisson){
+  cv.h <- numeric(l.h)
+  if (is.null(h.range)) {
+    hh <- c(h.select(X, Y, method = "cv"),
+            h.select(X, Y, method = "aicc"))
+    h.range <- range(hh)*c(1/1.1, 1.5)
+  }
+  i <- 0
+  gr.h <- exp(seq(log(h.range[1]), log(h.range[2]), l = l.h))
+  for (h in gr.h) {
+    i <- i + 1
+    cat("**************")
+    cv.h[i] <- method(X, Y, h)
+    cat("++++++++++++")
+  }
+  return(list(h = gr.h,
+              cv.h = cv.h, 
+              h.cv = gr.h[which.max(cv.h)]))
+}
+
+  
+```
+
+## 2.2. Local Poisson regression for Country Development
+
+We now fit a local Poisson regression for `le.fm.r`, a rounded version of the variable `le.fm`, as a function of `Life.expec`.
+
+```{r}
+options(warn = 2)
+le.fm.r <- round(data$le.fm)
+
+h.CV.loglik <- h.cv.sm.poisson(X = data$Life.expec, Y = le.fm.r, h.range = c(1,20),
+                               method = loglik.CV.poisson)
+
+plot(h.CV.loglik$h,h.CV.loglik$cv.h, main = "Log-Likelihood ~ h",
+     xlab = "h", ylab = "CV-LogLikelihood")
+lines(h.CV.loglik$h,h.CV.loglik$cv.h)
+```
+
