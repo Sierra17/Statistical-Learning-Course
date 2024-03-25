@@ -1,0 +1,59 @@
+---
+title: 'Assignment 5: GAM'
+author: "Víctor Villegas, Roger Llorenç, Luis Sierra"
+date: "2024-03-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Clears plots
+while (dev.cur() != 1) {
+  dev.off()
+}
+# Clears global environment
+rm(list = ls())
+
+set.seed(1234)
+```
+
+In this report we will be fitting several GAM (including semi-parametric models) explaining the resulting Ferriman-Gallwey score for Hisutism data `FGm12` at the end of a 12-month study. To do so, we will be using the following variables:
+
+- `Treatment`
+- `FGm0`
+- `SysPres`
+- `DiaPres`
+- `weight`
+- `height`
+
+
+```{r}
+library(mgcv)
+hirs_data <- read.table("hirsutism.dat",header=T, sep="\t",fill=TRUE)
+hirs_data$Treatment <- as.factor(hirs_data$Treatment)
+summary(hirs_data)
+```
+
+## Proposed models
+
+```{r}
+gam_simple <- gam(FGm12 ~ (FGm0) + (Treatment) + (SysPres)
+             + (DiaPres) + (weight) + (height), 
+             data = hirs_data)
+summary(gam_simple)
+gam.check(gam_simple)
+```
+
+The variables `weight` and `DiaPres` for diastolic pressure have large $p$-values so we may remove them from the model. We also apply smoothing to the non-factor variables.
+
+```{r}
+# excluding the variables `DiaPres` and `weight`
+gam_2 <- gam(FGm12 ~ s(FGm0) + (Treatment) + 
+               s(SysPres) + s(height), 
+             data = hirs_data)
+summary(gam_2)
+gam.check(gam_2)
+```
