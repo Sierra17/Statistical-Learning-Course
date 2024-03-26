@@ -95,23 +95,24 @@ summary(gam_1)
     # plot(gam_1, residuals = TRUE, shade=TRUE, seWithMean=TRUE)
     ```
 
-### 2. Joining weight and height
+### 2. Joining variables
 
 -   We fit jointly weight and height by `te(weight,height)` in order to capture the physical effect.
+-   We fit jointly systolic and diastolic blood pressure by `te(SysPres,DiaPres)` in order to capture the physical effect.
 
 ```{r}
 gam_2 <- gam(FGm12 ~ 
-             s(FGm0) + Treatment + s(SysPres) + 
-             s(DiaPres) + te(weight,height),
+             s(FGm0) + Treatment
+             + te(SysPres,DiaPres) + te(weight,height),
              data = hirsutism)
 summary(gam_2)
 ```
 
 -   **p-value:** There hasn't been an improvement.
 
--   **R-squared (adjusted):** 30.5%
+-   **R-squared (adjusted):** 31.6%
 
--   **Deviance explained:** It has increased to 42.6%.
+-   **Deviance explained:** It has increased to 44.5%.
 
     The increase of these two last values means an improvement in the explanatory potential of the model, that is, this model is better than the previous one.
 
@@ -133,12 +134,14 @@ summary(gam_2)
     ```{r}
     vis.gam(gam_2, view=c("weight","height"), plot.type = "persp", theta=30, phi=30)
     vis.gam(gam_2, view=c("weight","height"), plot.type = "contour")
+
+    vis.gam(gam_2, view=c("SysPres","DiaPres"), plot.type = "persp", theta=30, phi=30)
+    vis.gam(gam_2, view=c("SysPres","DiaPres"), plot.type = "contour")
     ```
 
 **Refinements** that can be done are:
 
-1.  Certain variables could be removed from the model because the corresponding `p-values` are large.
-2.  Some smoothed terms (those with `edf` very close to 1) can be replaced by linear terms: `SysPres`.
+-   Certain variables could be removed from the model because the corresponding `p-values` are large.
 
 ### 3. Refining
 
@@ -146,15 +149,8 @@ Now we remove non-significant variables from the model one at a time, in decreas
 
 ```{r}
 gam_3 <- gam(FGm12 ~ 
-             s(FGm0) + Treatment + s(SysPres) + 
-             s(DiaPres),
-             data = hirsutism)
-summary(gam_3)
-```
-
-```{r}
-gam_3 <- gam(FGm12 ~ 
-             s(FGm0) + Treatment + s(SysPres),
+             s(FGm0) + Treatment
+             + te(SysPres,DiaPres),
              data = hirsutism)
 summary(gam_3)
 ```
