@@ -2,7 +2,9 @@
 title: 'Assignment 5: GAM'
 author: "Víctor Villegas, Roger Llorenç, Luis Sierra"
 date: "2024-03-26"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -124,7 +126,8 @@ summary(gam_1)
     points(Treatment,FGm0,col="blue")
     qqPlot(gam_1$residuals, id=FALSE)
     ```
-From the quantile-quantile plot, we may observe some evidence for heavy tails, which may indicate that the assumption of normality is too strong. 
+
+    From the quantile-quantile plot, we may observe some evidence for heavy tails, which may indicate that the assumption of normality is too strong.
 
     **Individual effects** of each explanatory variable:
 
