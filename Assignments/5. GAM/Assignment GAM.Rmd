@@ -253,10 +253,6 @@ summary(gam_2b)
 
 -   **Deviance explained:** 100%.
 
-## 5. A semi-parametric model
-
-Sometimes some of the explanatory variables involved in the definition of an additive model (or a generalized additive model) affect the response variable linearly. If this is known in advance, the GAM model can be reformulated allowing some of the functions to be linear.
-
 # ANOVA type tests
 
 Now we test the null hypothesis that states one model is correct against the alternative that another model is better.
