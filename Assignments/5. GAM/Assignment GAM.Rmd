@@ -62,7 +62,33 @@ attach(hirsutism)
 summary(hirsutism)
 ```
 
-### 1. The simplest one
+### 0. Linear additive model
+
+```{r}
+gam_0 <- gam(FGm12 ~ 
+             (FGm0) + Treatment + (SysPres) + 
+             (DiaPres) + (weight) + (height),
+             data = hirsutism)
+summary(gam_0)
+```
+
+-   **p-value:** [None]{.underline} of the following are statistically significant since their p-value is too high: `SysPres`, `weight`, `height`.
+
+-   **R-squared (adjusted):** The model explains around 17% of the variance in `FGm12`.
+
+-   **Deviance explained:** 24.4%.
+
+    The previous two values lead us to conclude that the explanatory potential of this model is limited but not null.
+
+-   **Number of observations:** notice that the `gam` functions removes the 8 observations with missing values. So `n=91`.
+
+-   **Visualization:**
+
+    ```{r}
+    gam.check(gam_0)
+    ```
+
+### 1. Smoothing
 
 -   Variable `Treatment` is a factor, so it doesn't have to be smoothed.
 
@@ -74,22 +100,24 @@ gam_1 <- gam(FGm12 ~
 summary(gam_1)
 ```
 
--   **p-value:** [None]{.underline} of the following are statistically significant since their p-value is too high: `SysPres`, `weight`, `height`.
+-   **p-value:** the relevant values don't change.
 
--   **R-squared (adjusted):** The model explains around 28.8% of the variance in `FGm12`. It is low, indicating that a substantial proportion of the variability in `FGm12` is not explained.
+-   **R-squared (adjusted):** The model explains around 28.8% of the variance in `FGm12`.
 
 -   **Deviance explained:** 39.9%.
 
-    The previous two values lead us to conclude that the explanatory potential of this model is limited but not null.
+    The explanatory potential of the model has improved a considerable amount with respect to the previous one.
 
 -   **Number of observations:** notice that the `gam` functions removes the 8 observations with missing values. So `n=91`.
 
--   **Visualization of individual effects of each explanatory variable:**
+-   **Visualization:**
 
     ```{r}
     # gam.check(gam_1)
     vis.gam(gam_1)
     ```
+
+    Individual effects of each explanatory variable:
 
     ```{r}
     # plot(gam_1, residuals = TRUE, shade=TRUE, seWithMean=TRUE)
