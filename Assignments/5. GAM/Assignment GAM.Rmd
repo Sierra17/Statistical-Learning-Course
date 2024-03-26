@@ -34,7 +34,7 @@ The assignment of patients into treatments is typically done by computers, where
 
 ## GAMs for hirsutism data
 
-In this report we'll several GAM models (including semi-parametric models) explaining `FGm12` as a function of the variables that were measured at the beginning of the clinical trial and Treatment (treated as factor, which can by used as value of parameter by in function `s()`).
+In this report we'll explore several GAM models (including semi-parametric models) explaining `FGm12` as a function of the variables that were measured at the beginning of the clinical trial and Treatment (treated as factor, which can by used as value of parameter by in function `s()`).
 
 One of the advantages of GAM models is that they can overcome the curse of dimensionality.
 
@@ -53,8 +53,10 @@ To do this, we will be using the following variables:
 
 ```{r}
 library(mgcv)
+library(ggplot2)
+library(car)
 # data separated by tab, fill in missing values
-hirsutism <- read.table("hirsutism.dat",header=T, sep="\t",fill=TRUE)
+hirsutism <- read.table("hirsutism.dat", header=T, sep="\t",fill=TRUE)
 hirsutism <- na.omit(hirsutism)
 # we're using the variable Treatment as a categorical predictor
 hirsutism$Treatment <- as.factor(hirsutism$Treatment)
@@ -87,6 +89,7 @@ summary(gam_0)
 
     ```{r}
     gam.check(gam_0)
+    qqPlot(gam_0$residuals, id=FALSE)
     ```
 
 ### 1. Smoothing
@@ -101,7 +104,7 @@ gam_1 <- gam(FGm12 ~
 summary(gam_1)
 ```
 
--   **p-value:** the relevant values don't change.
+-   **p-value:** the meaning of the relevant values don't change.
 
 -   **R-squared (adjusted):** The model explains around 28.8% of the variance in `FGm12`.
 
@@ -119,7 +122,9 @@ summary(gam_1)
 
     vis.gam(gam_1,se=0,plot.type="contour",contour.col=1)
     points(Treatment,FGm0,col="blue")
+    qqPlot(gam_1$residuals, id=FALSE)
     ```
+From the quantile-quantile plot, we may observe some evidence for heavy tails, which may indicate that the assumption of normality is too strong. 
 
     **Individual effects** of each explanatory variable:
 
@@ -129,7 +134,7 @@ summary(gam_1)
 
 ### 2. Joining variables
 
--   We fit jointly weight and height by `te(weight,height)` in order to capture the physical effect.
+-   We fit jointly weight and height by taking the tensor product as `te(weight,height)` in order to capture the physical effect.
 -   We fit jointly systolic and diastolic blood pressure by `te(SysPres,DiaPres)` in order to capture the physical effect.
 
 ```{r}
@@ -140,7 +145,7 @@ gam_2 <- gam(FGm12 ~
 summary(gam_2)
 ```
 
--   **p-value:** There hasn't been an improvement.
+-   **p-value:** There hasn't been an improvement, the non-significant variables remain so.
 
 -   **R-squared (adjusted):** 31.6%
 
@@ -157,6 +162,7 @@ summary(gam_2)
 
     vis.gam(gam_2,se=0,plot.type="contour",contour.col=1)
     points(Treatment,FGm0,col="blue")
+    qqPlot(gam_2$residuals, id=FALSE)
     ```
 
     **Individual effects** of each explanatory variable:
@@ -186,11 +192,11 @@ summary(gam_2)
 Now we remove non-significant variables from the model one at a time, in decreasing order of p-values, until all variables are significant.
 
 ```{r}
-gam_3 <- gam(FGm12 ~ 
+gam_3a <- gam(FGm12 ~ 
              s(FGm0) + Treatment
              + te(SysPres,DiaPres),
              data = hirsutism)
-summary(gam_3)
+summary(gam_3a)
 ```
 
 ```{r}
@@ -206,17 +212,18 @@ summary(gam_3)
 
 -   **Deviance explained:** 34,1%.
 
-    The increase of these two last values means an improvement in the explanatory potential of the model, that is, this model is better than the previous one.
+    The increase of these two last values means an improvement in the explanatory potential of the model, that is, this model looks better than the previous one.
 
 -   **Visualization:**
 
     ```{r}
     gam.check(gam_3)
 
-    vis.gam(gam_3,se=0,theta =40, phi = 10, d=4,nticks=3)
+    vis.gam(gam_3, se=0, theta = 40, phi = 10, d=4,nticks=3)
 
-    vis.gam(gam_1,se=0,plot.type="contour",contour.col=1)
+    vis.gam(gam_1, se=0, plot.type="contour",contour.col=1)
     points(Treatment,FGm0,col="blue")
+    qqPlot(gam_3$residuals, id=FALSE)
     ```
 
     ```{r}
@@ -224,6 +231,8 @@ summary(gam_3)
     ```
 
 ## 4. `Treatment` as a parameter of `s()`
+
+Now we separate the continuous variables according to the treatment group.
 
 ```{r}
 gam_1b <- gam(FGm12 ~ 
@@ -255,18 +264,21 @@ summary(gam_2b)
 
 # ANOVA type tests
 
-Now we test the null hypothesis that states one model is correct against the alternative that another model is better.
+Now we test the null hypothesis that states one model is correct against the alternative that another model is better. To do so, we will compare the previous models among themselves. Recall `gam_3.2` was our simplest model.
 
 ```{r}
-anova(gam_0, gam_1, test="F")
+anova(gam_3, gam_3a, test="F")
+# accept null and gam_3 = gam_3a
 ```
 
 ```{r}
-anova(gam_0, gam_2, test="F")
+anova(gam_3a, gam_2, test="F")
+# accept null gam_3a = gam_2
 ```
 
 ```{r}
-anova(gam_0, gam_3, test="F")
+anova(gam_3, gam_2, test="F")
+# accept null gam_3 = gam_2
 ```
 
 ```{r}
@@ -278,5 +290,11 @@ anova(gam_1, gam_3, test="F")
 ```
 
 ```{r}
-anova(gam_2, gam_3, test="F")
+anova(gam_3, gam_1b, test="F")
 ```
+
+```{r}
+anova(gam_1b, gam_2b, test="F")
+```
+
+So model `gam_1b` would be our preferred option.
