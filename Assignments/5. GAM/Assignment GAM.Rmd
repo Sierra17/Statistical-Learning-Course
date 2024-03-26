@@ -62,62 +62,137 @@ attach(hirsutism)
 summary(hirsutism)
 ```
 
-### Model 1: the simplest one
-
-Including linear terms allows for the estimation of both linear and nonlinear relationships between the predictors and the response variable:
-
-```{r}
-gam_1 <- gam(FGm12 ~ 
-             FGm0 + Treatment + SysPres + 
-             DiaPres + weight + height,
-             data = hirsutism)
-summary(gam_1)
-```
-
-```{r}
-# gam.check(gam_1)
-```
-
--   **p-value:** None of the following are statistically significant (p \> 0.05): `SysPres`, `DiaPres`, `weight`, `height`.
-
--   **R-squared (adjusted):** The model explains around 17% of the variance in `FGm12`. It is low, indicating that a substantial proportion of the variability in `FGm12` is not explained.
-
--   **Deviance explained:** 24.4%. It has some explanatory potential.
-
--   **Number of observations:** notice that the `gam` functions removes the 8 observations with missing values. So `n=91`.
-
-We'll start the refinements by adding the nonlinear terms.
-
-### Model 2: Adding Nonlinear Terms
+### 1. The simplest one
 
 -   Variable `Treatment` is a factor, so it doesn't have to be smoothed.
 
 ```{r}
-gam_2 <- gam(FGm12 ~ 
+gam_1 <- gam(FGm12 ~ 
              s(FGm0) + Treatment + s(SysPres) + 
              s(DiaPres) + s(weight) + s(height),
+             data = hirsutism)
+summary(gam_1)
+```
+
+-   **p-value:** [None]{.underline} of the following are statistically significant since their p-value is too high: `SysPres`, `weight`, `height`.
+
+-   **R-squared (adjusted):** The model explains around 28.8% of the variance in `FGm12`. It is low, indicating that a substantial proportion of the variability in `FGm12` is not explained.
+
+-   **Deviance explained:** 39.9%.
+
+    The previous two values lead us to conclude that the explanatory potential of this model is limited but not null.
+
+-   **Number of observations:** notice that the `gam` functions removes the 8 observations with missing values. So `n=91`.
+
+-   **Visualization of individual effects of each explanatory variable:**
+
+    ```{r}
+    # gam.check(gam_1)
+    vis.gam(gam_1)
+    ```
+
+    ```{r}
+    # plot(gam_1, residuals = TRUE, shade=TRUE, seWithMean=TRUE)
+    ```
+
+### 2. Joining weight and height
+
+-   We fit jointly weight and height by `te(weight,height)` in order to capture the physical effect.
+
+```{r}
+gam_2 <- gam(FGm12 ~ 
+             s(FGm0) + Treatment + s(SysPres) + 
+             s(DiaPres) + te(weight,height),
              data = hirsutism)
 summary(gam_2)
 ```
 
--   **p-value:** None of the following are statistically significant (p \> 0.05): `SysPres`, `DiaPres`, `weight`, `height`.
+-   **p-value:** There hasn't been an improvement.
 
--   **R-squared (adjusted):** The model explains around 17% of the variance in `FGm12`. It is low, indicating that a substantial proportion of the variability in `FGm12` is not explained.
+-   **R-squared (adjusted):** 30.5%
 
--   **Deviance explained:** 24.4%. It has some explanatory potential.
+-   **Deviance explained:** It has increased to 42.6%.
 
-### Model n-1: joining
+    The increase of these two last values means an improvement in the explanatory potential of the model, that is, this model is better than the previous one.
 
--   We fit jointly weight and height by `te(weight,heigth)` in order to capture the physical effect.
+-   **Visualization:**
 
-### Model n
+    ```{r}
+    # gam.check(gam_2)
+    ```
 
-The variables `weight` and `DiaPres` for diastolic pressure have large $p$-values so we may remove them from the model. We also apply smoothing to the non-factor variables.
+    Individual effects of each explanatory variable:
+
+    ```{r}
+    plot(gam_2, residuals = TRUE, shade=TRUE, seWithMean=TRUE)
+    vis.gam(gam_2)
+    ```
+
+    Joint effects of a pair of variables
+
+    ```{r}
+    vis.gam(gam_2, view=c("weight","height"), plot.type = "persp", theta=30, phi=30)
+    vis.gam(gam_2, view=c("weight","height"), plot.type = "contour")
+    ```
+
+**Refinements** that can be done are:
+
+1.  Certain variables could be removed from the model because the corresponding `p-values` are large.
+2.  Some smoothed terms (those with `edf` very close to 1) can be replaced by linear terms: `SysPres`.
+
+### 3. Refining
+
+Now we remove non-significant variables from the model one at a time, in decreasing order of p-values, until all variables are significant.
 
 ```{r}
-# excluding the variables `DiaPres` and `weight`
-gam_n <- gam(FGm12 ~ s(FGm0) + Treatment + 
-               s(SysPres) + s(height), 
+gam_3 <- gam(FGm12 ~ 
+             s(FGm0) + Treatment + s(SysPres) + 
+             s(DiaPres),
              data = hirsutism)
+summary(gam_3)
+```
 
+```{r}
+gam_3 <- gam(FGm12 ~ 
+             s(FGm0) + Treatment + s(SysPres),
+             data = hirsutism)
+summary(gam_3)
+```
+
+```{r}
+gam_3 <- gam(FGm12 ~ 
+             s(FGm0) + Treatment,
+             data = hirsutism)
+summary(gam_3)
+```
+
+-   **p-value:** the only variable left is `FGm0`.
+
+-   **R-squared (adjusted):** 27,7%
+
+-   **Deviance explained:** 34,1%.
+
+    The increase of these two last values means an improvement in the explanatory potential of the model, that is, this model is better than the previous one.
+
+-   **Visualization:**
+
+    ```{r}
+    gam.check(gam_3)
+    ```
+
+    ```{r}
+    vis.gam(gam_3)
+    plot(gam_3, residuals = TRUE, seWithMean=TRUE)
+    ```
+
+## 4. A semi-parametric model
+
+Sometimes some of the explanatory variables involved in the definition of an additive model (or a generalized additive model) affect the response variable linearly. If this is known in advance, the GAM model can be reformulated allowing some of the functions to be linear.
+
+# Checking
+
+Now we test the null hypothesis that states the final model is correct again the alternative that states that the full model is better.
+
+```{r}
+anova(gam9,full.gam.k,test="F")
 ```
