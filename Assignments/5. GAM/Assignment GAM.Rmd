@@ -32,9 +32,11 @@ To be effective, it is generally recommended that double-blind trials include ar
 
 The assignment of patients into treatments is typically done by computers, where the computer assigns each patient a code number and treatment group. The doctor and patients only know the code number to avoid bias, hence allowing the study to be double-blind.
 
-## Introduction
+## GAMs for hirsutism data
 
-In this report we will be fitting several GAM (including semi-parametric models) explaining the resulting Ferriman-Gallwey score for Hisutism data `FGm12` at the end of a 12-month study.
+Fit several GAM models (including semi-parametric models) explaining `FGm12` as a function of the variables that were measured at the beginning of the clinical trial and Treatment (treated as factor, which can by used as value of parameter by in function `s()`).
+
+Then use functions `summary`, `plot`, `vis.gam` and `gam.check` to get an insight into the fitted models.
 
 To do so, we will be using the following variables:
 
@@ -53,12 +55,6 @@ hir_data <- read.table("hirsutism.dat",header=T, sep="\t",fill=TRUE)
 hir_data$Treatment <- as.factor(hir_data$Treatment)
 summary(hir_data)
 ```
-
-## GAMs for hirsutism data
-
-Fit several GAM models (including semiparametric models) explaining `FGm12` as a function of the variables that were measured at the beginning of the clinical trial and Treatment (treated as factor, which can by used as value of parameter by in function `s()`).
-
-Use functions `summary`, `plot`, `vis.gam` and `gam.check` to get an insight into the fitted models.
 
 ### Model 1
 
