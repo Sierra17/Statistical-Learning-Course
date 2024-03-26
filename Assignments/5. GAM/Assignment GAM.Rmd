@@ -36,9 +36,11 @@ The assignment of patients into treatments is typically done by computers, where
 
 In this report we'll several GAM models (including semi-parametric models) explaining `FGm12` as a function of the variables that were measured at the beginning of the clinical trial and Treatment (treated as factor, which can by used as value of parameter by in function `s()`).
 
-Then use functions `summary`, `plot`, `vis.gam` and `gam.check` to get an insight into the fitted models.
+One of the advantages of GAM models is that they can overcome the curse of dimensionality.
 
-To do so, we will be using the following variables:
+Then we use functions `summary`, `plot`, `vis.gam` and `gam.check` to get an insight into the fitted models.
+
+To do this, we will be using the following variables:
 
 -   `Treatment`, with values 0 to 3.
 -   `FGm0`, always greater than 15. Indicates the baseline hirsutism level at the randomization
@@ -51,28 +53,71 @@ To do so, we will be using the following variables:
 
 ```{r}
 library(mgcv)
-hir_data <- read.table("hirsutism.dat",header=T, sep="\t",fill=TRUE)
-hir_data$Treatment <- as.factor(hir_data$Treatment)
-summary(hir_data)
+# data separated by tab, fill in missing values
+hirsutism <- read.table("hirsutism.dat",header=T, sep="\t",fill=TRUE)
+# we're using the variable Treatment as a categorical predictor
+hirsutism$Treatment <- as.factor(hirsutism$Treatment)
+
+attach(hirsutism)
+summary(hirsutism)
 ```
 
-### Model 1
+### Model 1: the simplest one
+
+Including linear terms allows for the estimation of both linear and nonlinear relationships between the predictors and the response variable:
 
 ```{r}
-gam_simple <- gam(FGm12 ~ (FGm0) + (Treatment) + (SysPres)
-             + (DiaPres) + (weight) + (height), 
-             data = hir_data)
-summary(gam_simple)
-gam.check(gam_simple)
+gam_1 <- gam(FGm12 ~ 
+             FGm0 + Treatment + SysPres + 
+             DiaPres + weight + height,
+             data = hirsutism)
+summary(gam_1)
 ```
+
+```{r}
+# gam.check(gam_1)
+```
+
+-   **p-value:** None of the following are statistically significant (p \> 0.05): `SysPres`, `DiaPres`, `weight`, `height`.
+
+-   **R-squared (adjusted):** The model explains around 17% of the variance in `FGm12`. It is low, indicating that a substantial proportion of the variability in `FGm12` is not explained.
+
+-   **Deviance explained:** 24.4%. It has some explanatory potential.
+
+-   **Number of observations:** notice that the `gam` functions removes the 8 observations with missing values. So `n=91`.
+
+We'll start the refinements by adding the nonlinear terms.
+
+### Model 2: Adding Nonlinear Terms
+
+-   Variable `Treatment` is a factor, so it doesn't have to be smoothed.
+
+```{r}
+gam_2 <- gam(FGm12 ~ 
+             s(FGm0) + Treatment + s(SysPres) + 
+             s(DiaPres) + s(weight) + s(height),
+             data = hirsutism)
+summary(gam_2)
+```
+
+-   **p-value:** None of the following are statistically significant (p \> 0.05): `SysPres`, `DiaPres`, `weight`, `height`.
+
+-   **R-squared (adjusted):** The model explains around 17% of the variance in `FGm12`. It is low, indicating that a substantial proportion of the variability in `FGm12` is not explained.
+
+-   **Deviance explained:** 24.4%. It has some explanatory potential.
+
+### Model n-1: joining
+
+-   We fit jointly weight and height by `te(weight,heigth)` in order to capture the physical effect.
+
+### Model n
 
 The variables `weight` and `DiaPres` for diastolic pressure have large $p$-values so we may remove them from the model. We also apply smoothing to the non-factor variables.
 
 ```{r}
 # excluding the variables `DiaPres` and `weight`
-gam_2 <- gam(FGm12 ~ s(FGm0) + (Treatment) + 
+gam_n <- gam(FGm12 ~ s(FGm0) + Treatment + 
                s(SysPres) + s(height), 
-             data = hir_data)
-summary(gam_2)
-gam.check(gam_2)
+             data = hirsutism)
+
 ```
