@@ -22,13 +22,12 @@ set.seed(1234)
 
 In this report we will be fitting several GAM (including semi-parametric models) explaining the resulting Ferriman-Gallwey score for Hisutism data `FGm12` at the end of a 12-month study. To do so, we will be using the following variables:
 
-- `Treatment`
-- `FGm0`
-- `SysPres`
-- `DiaPres`
-- `weight`
-- `height`
-
+-   `Treatment`
+-   `FGm0`
+-   `SysPres`
+-   `DiaPres`
+-   `weight`
+-   `height`
 
 ```{r}
 library(mgcv)
