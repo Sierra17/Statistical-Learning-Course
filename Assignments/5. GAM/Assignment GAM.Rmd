@@ -34,7 +34,7 @@ The assignment of patients into treatments is typically done by computers, where
 
 ## GAMs for hirsutism data
 
-Fit several GAM models (including semi-parametric models) explaining `FGm12` as a function of the variables that were measured at the beginning of the clinical trial and Treatment (treated as factor, which can by used as value of parameter by in function `s()`).
+In this report we'll several GAM models (including semi-parametric models) explaining `FGm12` as a function of the variables that were measured at the beginning of the clinical trial and Treatment (treated as factor, which can by used as value of parameter by in function `s()`).
 
 Then use functions `summary`, `plot`, `vis.gam` and `gam.check` to get an insight into the fitted models.
 
