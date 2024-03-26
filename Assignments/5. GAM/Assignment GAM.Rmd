@@ -113,14 +113,17 @@ summary(gam_1)
 -   **Visualization:**
 
     ```{r}
-    # gam.check(gam_1)
-    vis.gam(gam_1)
+    gam.check(gam_1)
+    vis.gam(gam_1,se=0,theta =40, phi = 10, d=4,nticks=3)
+
+    vis.gam(gam_1,se=0,plot.type="contour",contour.col=1)
+    points(Treatment,FGm0,col="blue")
     ```
 
-    Individual effects of each explanatory variable:
+    **Individual effects** of each explanatory variable:
 
     ```{r}
-    # plot(gam_1, residuals = TRUE, shade=TRUE, seWithMean=TRUE)
+    plot(gam_1, residuals = TRUE, shade=TRUE, seWithMean=TRUE)
     ```
 
 ### 2. Joining variables
@@ -147,31 +150,37 @@ summary(gam_2)
 -   **Visualization:**
 
     ```{r}
-    # gam.check(gam_2)
+    gam.check(gam_2)
+
+    vis.gam(gam_2,se=0,theta =40, phi = 10, d=4,nticks=3)
+
+    vis.gam(gam_2,se=0,plot.type="contour",contour.col=1)
+    points(Treatment,FGm0,col="blue")
     ```
 
-    Individual effects of each explanatory variable:
+    **Individual effects** of each explanatory variable:
 
     ```{r}
     plot(gam_2, residuals = TRUE, shade=TRUE, seWithMean=TRUE)
-    vis.gam(gam_2)
     ```
 
-    Joint effects of a pair of variables
+    **Joint effects** of a pair of variables
 
     ```{r}
-    vis.gam(gam_2, view=c("weight","height"), plot.type = "persp", theta=30, phi=30)
-    vis.gam(gam_2, view=c("weight","height"), plot.type = "contour")
+    vis.gam(gam_2, view=c("weight","height"), plot.type = "persp", theta=40, phi=10,d=4,nticks=3)
+    vis.gam(gam_2, view=c("weight","height"), plot.type = "contour",contour.col=1)
+    points(weight,height,col="blue")
 
-    vis.gam(gam_2, view=c("SysPres","DiaPres"), plot.type = "persp", theta=30, phi=30)
-    vis.gam(gam_2, view=c("SysPres","DiaPres"), plot.type = "contour")
+    vis.gam(gam_2, view=c("SysPres","DiaPres"), plot.type = "persp", theta=40, phi=10,d=4,nticks=3)
+    vis.gam(gam_2, view=c("SysPres","DiaPres"), plot.type = "contour",contour.col=1)
+    points(SysPres,DiaPres,col="blue")
     ```
 
 **Refinements** that can be done are:
 
 -   Certain variables could be removed from the model because the corresponding `p-values` are large.
 
-### 3. Refining
+### 3. Refining of (2)
 
 Now we remove non-significant variables from the model one at a time, in decreasing order of p-values, until all variables are significant.
 
@@ -202,14 +211,28 @@ summary(gam_3)
 
     ```{r}
     gam.check(gam_3)
+
+    vis.gam(gam_3,se=0,theta =40, phi = 10, d=4,nticks=3)
+
+    vis.gam(gam_1,se=0,plot.type="contour",contour.col=1)
+    points(Treatment,FGm0,col="blue")
     ```
 
     ```{r}
-    vis.gam(gam_3)
     plot(gam_3, residuals = TRUE, seWithMean=TRUE)
     ```
 
-## 4. A semi-parametric model
+## 4. Treatment as a parameter of `s()`
+
+```{r}
+gam_1b <- gam(FGm12 ~ 
+             s(FGm0, by=Treatment) + s(SysPres, by=Treatment) + 
+             s(DiaPres, by=Treatment) + s(weight, by=Treatment) + s(height, by=Treatment),
+             data = hirsutism)
+summary(gam_1b)
+```
+
+## 5. A semi-parametric model
 
 Sometimes some of the explanatory variables involved in the definition of an additive model (or a generalized additive model) affect the response variable linearly. If this is known in advance, the GAM model can be reformulated allowing some of the functions to be linear.
 
