@@ -55,6 +55,7 @@ To do this, we will be using the following variables:
 library(mgcv)
 # data separated by tab, fill in missing values
 hirsutism <- read.table("hirsutism.dat",header=T, sep="\t",fill=TRUE)
+hirsutism <- na.omit(hirsutism)
 # we're using the variable Treatment as a categorical predictor
 hirsutism$Treatment <- as.factor(hirsutism$Treatment)
 
@@ -194,7 +195,7 @@ summary(gam_3)
 
 ```{r}
 gam_3 <- gam(FGm12 ~ 
-             s(FGm0) + Treatment,
+             s(FGm0) + (Treatment),
              data = hirsutism)
 summary(gam_3)
 ```
@@ -260,8 +261,6 @@ Sometimes some of the explanatory variables involved in the definition of an add
 
 Now we test the null hypothesis that states one model is correct against the alternative that another model is better.
 
--   `gam_0` against `gam_1`
-
 ```{r}
 anova(gam_0, gam_1, test="F")
 ```
@@ -275,21 +274,13 @@ anova(gam_0, gam_3, test="F")
 ```
 
 ```{r}
-anova(gam_2, gam_1, test="F")
+anova(gam_1, gam_2, test="F")
 ```
 
 ```{r}
-anova(gam_3, gam_1, test="F")
+anova(gam_1, gam_3, test="F")
 ```
 
 ```{r}
-anova(gam_3, gam_2, test="F")
-```
-
-```{r}
-anova(gam_1, gam_4, test="F")
-```
-
-```{r}
-anova(gam_0, gam_3, gam_2, gam_4, gam_1, test="F")
+anova(gam_2, gam_3, test="F")
 ```
