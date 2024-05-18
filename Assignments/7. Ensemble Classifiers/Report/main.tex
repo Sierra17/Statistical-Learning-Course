@@ -415,7 +415,7 @@ in the files \texttt{cancerData.csv} and \texttt{cancerInfo.csv}.
 \end{tcolorbox}
 
     \hypertarget{exploratory-data-analysis}{%
-\section{1. Exploratory Data
+\section{Exploratory Data
 Analysis}\label{exploratory-data-analysis}}
 
 We first import the data and analyse its structure. We can immediately
@@ -713,7 +713,7 @@ twenty first principal components amounts to almost 90\%. Our final
 classifiers will only include ten peptides as features to train on.
 
     \hypertarget{train-test-split}{%
-\section{2.Train-Test Split}\label{train-test-split}}
+\section{Train-Test Split}\label{train-test-split}}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
 \prompt{In}{incolor}{12}{\boxspacing}
@@ -748,13 +748,13 @@ classifiers will only include ten peptides as features to train on.
     \end{Verbatim}
 
     \hypertarget{model-fitting}{%
-\section{3. Model fitting}\label{model-fitting}}
+\section{Model fitting}\label{model-fitting}}
 
     We'll fit the following models: a Random Forest Classifier and two
 Boosting Classifiers.
 
     \hypertarget{random-forest-classifier}{%
-\subsection{3.1. Random Forest
+\subsection{Random Forest
 Classifier}\label{random-forest-classifier}}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
@@ -890,7 +890,7 @@ following code:
     \end{Verbatim}
 
     \hypertarget{gradient-boosting}{%
-\subsection{3.2. Gradient Boosting}\label{gradient-boosting}}
+\subsection{Gradient Boosting}\label{gradient-boosting}}
 
     Using stumps as classification trees for the response variable, we
 compute the misclassification rates of both the learning set and the
@@ -1021,7 +1021,7 @@ Text(0.5, 1.0, 'Gradient Boosting Error Evolution')
     { \hspace*{\fill} \\}
     
     \hypertarget{xgboost}{%
-\subsection{3.3. XGBoost}\label{xgboost}}
+\subsection{XGBoost}\label{xgboost}}
 
     To conclude, we introduce another boosting flavour and analyse its
 performance.
@@ -1161,7 +1161,7 @@ XGBClassifier(base\_score=None, booster=None, callbacks=None,
 class, and so has a large amount of Type 1 errors.
 
     \hypertarget{predictor-comparison}{%
-\section{4. Predictor comparison}\label{predictor-comparison}}
+\section{Predictor comparison}\label{predictor-comparison}}
 
     The accuracies of the three proposed models are the following:
 
