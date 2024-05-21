@@ -1,0 +1,1517 @@
+\documentclass[11pt]{article}
+
+    \usepackage[breakable]{tcolorbox}
+    \usepackage{parskip} % Stop auto-indenting (to mimic markdown behaviour)
+    
+
+    % Basic figure setup, for now with no caption control since it's done
+    % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
+    \usepackage{graphicx}
+    % Keep aspect ratio if custom image width or height is specified
+    \setkeys{Gin}{keepaspectratio}
+    % Maintain compatibility with old templates. Remove in nbconvert 6.0
+    \let\Oldincludegraphics\includegraphics
+    % Ensure that by default, figures have no caption (until we provide a
+    % proper Figure object with a Caption API and a way to capture that
+    % in the conversion process - todo).
+    \usepackage{caption}
+    \DeclareCaptionFormat{nocaption}{}
+    \captionsetup{format=nocaption,aboveskip=0pt,belowskip=0pt}
+
+    \usepackage{float}
+    \floatplacement{figure}{H} % forces figures to be placed at the correct location
+    \usepackage{xcolor} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    \usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    \usepackage{textcomp} % defines textquotesingle
+    % Hack from http://tex.stackexchange.com/a/47451/13684:
+    \AtBeginDocument{%
+        \def\PYZsq{\textquotesingle}% Upright quotes in Pygmentized code
+    }
+    \usepackage{upquote} % Upright quotes for verbatim code
+    \usepackage{eurosym} % defines \euro
+
+    \usepackage{iftex}
+    \ifPDFTeX
+        \usepackage[T1]{fontenc}
+        \IfFileExists{alphabeta.sty}{
+              \usepackage{alphabeta}
+          }{
+              \usepackage[mathletters]{ucs}
+              \usepackage[utf8x]{inputenc}
+          }
+    \else
+        \usepackage{fontspec}
+        \usepackage{unicode-math}
+    \fi
+
+    \usepackage{fancyvrb} % verbatim replacement that allows latex
+    \usepackage{grffile} % extends the file name processing of package graphics
+                         % to support a larger range
+    \makeatletter % fix for old versions of grffile with XeLaTeX
+    \@ifpackagelater{grffile}{2019/11/01}
+    {
+      % Do nothing on new versions
+    }
+    {
+      \def\Gread@@xetex#1{%
+        \IfFileExists{"\Gin@base".bb}%
+        {\Gread@eps{\Gin@base.bb}}%
+        {\Gread@@xetex@aux#1}%
+      }
+    }
+    \makeatother
+    \usepackage[Export]{adjustbox} % Used to constrain images to a maximum size
+    \adjustboxset{max size={0.9\linewidth}{0.9\paperheight}}
+
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    % The default LaTeX title has an obnoxious amount of whitespace. By default,
+    % titling removes some of it. It also provides customization options.
+    \usepackage{titling}
+    \usepackage{longtable} % longtable support required by pandoc >1.10
+    \usepackage{booktabs}  % table support for pandoc > 1.12.2
+    \usepackage{array}     % table support for pandoc >= 2.11.3
+    \usepackage{calc}      % table minipage width calculation for pandoc >= 2.11.1
+    \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
+    \usepackage[normalem]{ulem} % ulem is needed to support strikethroughs (\sout)
+                                % normalem makes italics be italics, not underlines
+    \usepackage{soul}      % strikethrough (\st) support for pandoc >= 3.0.0
+    \usepackage{mathrsfs}
+    
+
+    
+    % Colors for the hyperref package
+    \definecolor{urlcolor}{rgb}{0,.145,.698}
+    \definecolor{linkcolor}{rgb}{.71,0.21,0.01}
+    \definecolor{citecolor}{rgb}{.12,.54,.11}
+
+    % ANSI colors
+    \definecolor{ansi-black}{HTML}{3E424D}
+    \definecolor{ansi-black-intense}{HTML}{282C36}
+    \definecolor{ansi-red}{HTML}{E75C58}
+    \definecolor{ansi-red-intense}{HTML}{B22B31}
+    \definecolor{ansi-green}{HTML}{00A250}
+    \definecolor{ansi-green-intense}{HTML}{007427}
+    \definecolor{ansi-yellow}{HTML}{DDB62B}
+    \definecolor{ansi-yellow-intense}{HTML}{B27D12}
+    \definecolor{ansi-blue}{HTML}{208FFB}
+    \definecolor{ansi-blue-intense}{HTML}{0065CA}
+    \definecolor{ansi-magenta}{HTML}{D160C4}
+    \definecolor{ansi-magenta-intense}{HTML}{A03196}
+    \definecolor{ansi-cyan}{HTML}{60C6C8}
+    \definecolor{ansi-cyan-intense}{HTML}{258F8F}
+    \definecolor{ansi-white}{HTML}{C5C1B4}
+    \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+    \definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
+    \definecolor{ansi-default-inverse-bg}{HTML}{000000}
+
+    % common color for the border for error outputs.
+    \definecolor{outerrorbackground}{HTML}{FFDFDF}
+
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    \providecommand{\tightlist}{%
+      \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+
+    % Additional commands for more recent versions of Pandoc
+    \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{{#1}}}
+    \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{{#1}}}
+    \newcommand{\ImportTok}[1]{{#1}}
+    \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{{#1}}}}
+    \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{{#1}}}
+    \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{{#1}}}
+    \newcommand{\BuiltInTok}[1]{{#1}}
+    \newcommand{\ExtensionTok}[1]{{#1}}
+    \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{{#1}}}
+    \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{{#1}}}
+    \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+
+
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatibility definitions
+    \def\gt{>}
+    \def\lt{<}
+    \let\Oldtex\TeX
+    \let\Oldlatex\LaTeX
+    \renewcommand{\TeX}{\textrm{\Oldtex}}
+    \renewcommand{\LaTeX}{\textrm{\Oldlatex}}
+    % Document parameters
+    % Document title
+    \title{Task 2: Ensemble Classifiers}
+    \author{Roger Llorenç, Víctor
+Villegas, Luis Sierra}
+    
+    
+    
+    
+    
+    
+    
+% Pygments definitions
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\@namedef{PY@tok@w}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\@namedef{PY@tok@c}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cp}{\def\PY@tc##1{\textcolor[rgb]{0.61,0.40,0.00}{##1}}}
+\@namedef{PY@tok@k}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\@namedef{PY@tok@o}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ow}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@nb}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@ne}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.80,0.25,0.22}{##1}}}
+\@namedef{PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\@namedef{PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.46,0.46,0.00}{##1}}}
+\@namedef{PY@tok@ni}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.41,0.47,0.13}{##1}}}
+\@namedef{PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nd}{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@s}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sd}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@si}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@se}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.36,0.12}{##1}}}
+\@namedef{PY@tok@sr}{\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@ss}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sx}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@m}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@gh}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gu}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gd}{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\@namedef{PY@tok@gi}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.52,0.00}{##1}}}
+\@namedef{PY@tok@gr}{\def\PY@tc##1{\textcolor[rgb]{0.89,0.00,0.00}{##1}}}
+\@namedef{PY@tok@ge}{\let\PY@it=\textit}
+\@namedef{PY@tok@gs}{\let\PY@bf=\textbf}
+\@namedef{PY@tok@ges}{\let\PY@bf=\textbf\let\PY@it=\textit}
+\@namedef{PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@go}{\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@gt}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\@namedef{PY@tok@err}{\def\PY@bc##1{{\setlength{\fboxsep}{\string -\fboxrule}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}}
+\@namedef{PY@tok@kc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kd}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kr}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@bp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@fm}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@vc}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vg}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vi}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vm}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sa}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sb}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@dl}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s2}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sh}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s1}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@mb}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mf}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mh}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mi}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@il}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mo}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ch}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cm}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cpf}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@c1}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cs}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % For linebreaks inside Verbatim environment from package fancyvrb.
+    \makeatletter
+        \newbox\Wrappedcontinuationbox
+        \newbox\Wrappedvisiblespacebox
+        \newcommand*\Wrappedvisiblespace {\textcolor{red}{\textvisiblespace}}
+        \newcommand*\Wrappedcontinuationsymbol {\textcolor{red}{\llap{\tiny$\m@th\hookrightarrow$}}}
+        \newcommand*\Wrappedcontinuationindent {3ex }
+        \newcommand*\Wrappedafterbreak {\kern\Wrappedcontinuationindent\copy\Wrappedcontinuationbox}
+        % Take advantage of the already applied Pygments mark-up to insert
+        % potential linebreaks for TeX processing.
+        %        {, <, #, %, $, ' and ": go to next line.
+        %        _, }, ^, &, >, - and ~: stay at end of broken line.
+        % Use of \textquotesingle for straight quote.
+        \newcommand*\Wrappedbreaksatspecials {%
+            \def\PYGZus{\discretionary{\char`\_}{\Wrappedafterbreak}{\char`\_}}%
+            \def\PYGZob{\discretionary{}{\Wrappedafterbreak\char`\{}{\char`\{}}%
+            \def\PYGZcb{\discretionary{\char`\}}{\Wrappedafterbreak}{\char`\}}}%
+            \def\PYGZca{\discretionary{\char`\^}{\Wrappedafterbreak}{\char`\^}}%
+            \def\PYGZam{\discretionary{\char`\&}{\Wrappedafterbreak}{\char`\&}}%
+            \def\PYGZlt{\discretionary{}{\Wrappedafterbreak\char`\<}{\char`\<}}%
+            \def\PYGZgt{\discretionary{\char`\>}{\Wrappedafterbreak}{\char`\>}}%
+            \def\PYGZsh{\discretionary{}{\Wrappedafterbreak\char`\#}{\char`\#}}%
+            \def\PYGZpc{\discretionary{}{\Wrappedafterbreak\char`\%}{\char`\%}}%
+            \def\PYGZdl{\discretionary{}{\Wrappedafterbreak\char`\$}{\char`\$}}%
+            \def\PYGZhy{\discretionary{\char`\-}{\Wrappedafterbreak}{\char`\-}}%
+            \def\PYGZsq{\discretionary{}{\Wrappedafterbreak\textquotesingle}{\textquotesingle}}%
+            \def\PYGZdq{\discretionary{}{\Wrappedafterbreak\char`\"}{\char`\"}}%
+            \def\PYGZti{\discretionary{\char`\~}{\Wrappedafterbreak}{\char`\~}}%
+        }
+        % Some characters . , ; ? ! / are not pygmentized.
+        % This macro makes them "active" and they will insert potential linebreaks
+        \newcommand*\Wrappedbreaksatpunct {%
+            \lccode`\~`\.\lowercase{\def~}{\discretionary{\hbox{\char`\.}}{\Wrappedafterbreak}{\hbox{\char`\.}}}%
+            \lccode`\~`\,\lowercase{\def~}{\discretionary{\hbox{\char`\,}}{\Wrappedafterbreak}{\hbox{\char`\,}}}%
+            \lccode`\~`\;\lowercase{\def~}{\discretionary{\hbox{\char`\;}}{\Wrappedafterbreak}{\hbox{\char`\;}}}%
+            \lccode`\~`\:\lowercase{\def~}{\discretionary{\hbox{\char`\:}}{\Wrappedafterbreak}{\hbox{\char`\:}}}%
+            \lccode`\~`\?\lowercase{\def~}{\discretionary{\hbox{\char`\?}}{\Wrappedafterbreak}{\hbox{\char`\?}}}%
+            \lccode`\~`\!\lowercase{\def~}{\discretionary{\hbox{\char`\!}}{\Wrappedafterbreak}{\hbox{\char`\!}}}%
+            \lccode`\~`\/\lowercase{\def~}{\discretionary{\hbox{\char`\/}}{\Wrappedafterbreak}{\hbox{\char`\/}}}%
+            \catcode`\.\active
+            \catcode`\,\active
+            \catcode`\;\active
+            \catcode`\:\active
+            \catcode`\?\active
+            \catcode`\!\active
+            \catcode`\/\active
+            \lccode`\~`\~
+        }
+    \makeatother
+
+    \let\OriginalVerbatim=\Verbatim
+    \makeatletter
+    \renewcommand{\Verbatim}[1][1]{%
+        %\parskip\z@skip
+        \sbox\Wrappedcontinuationbox {\Wrappedcontinuationsymbol}%
+        \sbox\Wrappedvisiblespacebox {\FV@SetupFont\Wrappedvisiblespace}%
+        \def\FancyVerbFormatLine ##1{\hsize\linewidth
+            \vtop{\raggedright\hyphenpenalty\z@\exhyphenpenalty\z@
+                \doublehyphendemerits\z@\finalhyphendemerits\z@
+                \strut ##1\strut}%
+        }%
+        % If the linebreak is at a space, the latter will be displayed as visible
+        % space at end of first line, and a continuation symbol starts next line.
+        % Stretch/shrink are however usually zero for typewriter font.
+        \def\FV@Space {%
+            \nobreak\hskip\z@ plus\fontdimen3\font minus\fontdimen4\font
+            \discretionary{\copy\Wrappedvisiblespacebox}{\Wrappedafterbreak}
+            {\kern\fontdimen2\font}%
+        }%
+
+        % Allow breaks at special characters using \PYG... macros.
+        \Wrappedbreaksatspecials
+        % Breaks at punctuation characters . , ; ? ! and / need catcode=\active
+        \OriginalVerbatim[#1,codes*=\Wrappedbreaksatpunct]%
+    }
+    \makeatother
+
+    % Exact colors from NB
+    \definecolor{incolor}{HTML}{303F9F}
+    \definecolor{outcolor}{HTML}{D84315}
+    \definecolor{cellborder}{HTML}{CFCFCF}
+    \definecolor{cellbackground}{HTML}{F7F7F7}
+
+    % prompt
+    \makeatletter
+    \newcommand{\boxspacing}{\kern\kvtcb@left@rule\kern\kvtcb@boxsep}
+    \makeatother
+    \newcommand{\prompt}[4]{
+        {\ttfamily\llap{{\color{#2}[#3]:\hspace{3pt}#4}}\vspace{-\baselineskip}}
+    }
+    
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=urlcolor,
+      linkcolor=linkcolor,
+      citecolor=citecolor,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    
+    
+
+\begin{document}
+    
+    \maketitle
+
+    \tableofcontents
+    
+    \hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+    \hypertarget{objectives}{%
+\subsection{Objectives}\label{objectives}}
+
+    Our main objective with this work is that of building and fitting
+ensemble-based tree models that, based on a dataset of cancer patients,
+predicts recurrence (reappearance of the disease) of cancer from
+putative recurrence biomarkers. To do so, we build, tune and compare
+(using \texttt{python}) three different types of models - Random
+Forests, Gradient Boosting and XGBoost, and then evaluate their
+performance on our dataset.
+
+    \hypertarget{materials-and-methods}{%
+\subsection{Materials and methods}\label{materials-and-methods}}
+
+    \hypertarget{Datasets-and-packages}{%
+\subsubsection{Datasets and
+packages}\label{mm1.-datasets-and-packages}}
+
+    The main python libraries used across the code are: - \texttt{numpy}:
+fundamental package for scientific computing in Python. -
+\texttt{pandas}: for a more powerful handling of datasets. -
+\texttt{pyplot}: we will use this submodule from \texttt{matplotlib} to
+do most of the plots. - \texttt{sklearn}: open source tool built on top
+of NumPy, and matplotlib. Along with its submodules, it will be the
+package used to carry out the coding related to the learning procedures.
+The submodules imported include tools to tune the models (such as
+\texttt{GridSearchCV}) or to build specific models
+(e.g.~\texttt{GradientBoostingClassifier})
+
+Apart from the libraries pre-imported in the following cell, we import
+other \texttt{sklearn} submodules when needed and the libraries:
+\texttt{itertools} (for readable and fast iteration) and
+\texttt{xgboost} (to build the model of the same name).
+
+    The datasets used are found in the \texttt{cancerDat.csv} and
+\texttt{cancerInfo.csv}, and include of cancer patients with the
+presence of 102 different peptides in the patients' organisms, which
+have been found to be related to recurrence. These are broken down and
+studied in the following section.
+
+    \hypertarget{procedure}{%
+\subsubsection{Procedure}\label{mm2.-procedure}}
+
+    The procedure followed involves four main steps.
+
+Firstly, we clean up the data to ensure it is ready to be used to build
+the model. This step involves the handling of missing data, renaming the
+variables and encoding them correctly. To that effect we perform a
+simple exploratory data analysis.
+
+Secondly, we randomly partition our data into train and test splits
+using functions from the \texttt{scikit-learn} library. The split will
+be of size \(2/3\) for training and \(1/3\) for testing.
+
+Thirdly, we will build the models, a Random Forest Classifier, a
+Gradient Boosted decision tree and XGBoost, on the training data (with
+the imported libraries) and tune their hyperparameters via a grid
+search.
+
+Lastly, we will analyse the strength of our models by looking at their
+predicted performance using the test set and evaluate their strengths
+and weaknesses.
+
+This study has been developed first answering the Questions posed in the
+assignment one by one and then developing a cohesive report exposing and
+analysing the results in depth. We have chosen Python to develop the
+program out of personal preference, but the R programming language is
+also a viable option.
+
+    \hypertarget{exploratory-data-analysis}{%
+\section{Exploratory Data Analysis}\label{exploratory-data-analysis}}
+
+    We visualize the structure of the data after importing the csv format
+files. We can see how the data is composed of a table of 129 patients
+with 102 variables, 101 of which are peptide biomarkers and the the
+other one is the response variable on the recurrence.
+
+The other table corresponds to the same patients but with a single,
+extra variable \texttt{site}, which is of factor type, that may be
+related to the kind of recurrence, but the authors are not experts in
+the domain of clinical oncology. As such, it was decided to omit the
+treatment of this variable to focus solely on the statistical analysis
+of the raw recurrence.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{6}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{df1}\PY{o}{.}\PY{n}{shape}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{df2}\PY{o}{.}\PY{n}{shape}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+(129, 102)
+(129, 1)
+    \end{Verbatim}
+
+    By a coarse inspection of the datafile, we can immediately see that the
+data ingestion pipeline will require some work, given the combination of
+the response and patient index into the same variable.
+
+    First, we define a single response variable according to whether the
+cancer sees a recurrence or not. This is originally coded into the key
+(index) of the patient, so a separate binary vector is created to encode
+this response, where \texttt{0} denotes non-recurrence and \texttt{1}
+denotes recurrence, stored as a Pandas series \texttt{y\ =\ labels\_1}.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{10}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{y} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{Series}\PY{p}{(}\PY{n}{y}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    The next step in the exploration phase is checking for missing values
+and calculating some descriptive statistics of the data. With the Pandas
+library one can easily locate the missing values; in fact there is a
+substantial amount of missing values (5151) in the dataset, so in order
+to avoid discarding such a large amount of information, we resort to
+imputing the linear interpolation of the missing entries, as calculated
+by Pandas' \texttt{interpolate} method. This artificially increases the
+amount of information that we work with, but we claim that for the final
+results this is preferable to eliminating the entire rows and rendering
+our dataset significantly smaller. The following outputs show the amount
+of missing values and how they are removed by linear interpolation.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{20}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{for} \PY{n}{col} \PY{o+ow}{in} \PY{n}{df1}\PY{p}{:}
+    \PY{n}{df1}\PY{p}{[}\PY{n}{col}\PY{p}{]} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{to\PYZus{}numeric}\PY{p}{(}\PY{n}{df1}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{,} \PY{n}{errors}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{coerce}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{df1}\PY{o}{.}\PY{n}{dtypes}\PY{p}{;}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{21}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{df1}\PY{o}{.}\PY{n}{isnull}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{values}\PY{o}{.}\PY{n}{any}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{n+nb}{sum}\PY{p}{(}\PY{n}{df1}\PY{o}{.}\PY{n}{isnull}\PY{p}{(}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\PY{n}{df1} \PY{o}{=} \PY{n}{df1}\PY{o}{.}\PY{n}{interpolate}\PY{p}{(}\PY{n}{method} \PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{linear}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{limit\PYZus{}direction} \PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{forward}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{df1}\PY{o}{.}\PY{n}{isnull}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{values}\PY{o}{.}\PY{n}{any}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+True
+5151
+False
+    \end{Verbatim}
+
+    Now that we have handled the missing values, we can go ahead and perform
+some more sophisticated exploration techniques. We provide a small
+snapshot (the first 9 variables) of the descriptive statistics of the dataset, but note that due
+to its large size, it is only possible to show a handful of the
+biomarker variables.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{9}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{df1}\PY{o}{.}\PY{n}{describe}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{9}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+              0           1           2           3           4           5    \textbackslash{}
+count  129.000000  129.000000  129.000000  129.000000  129.000000  129.000000
+mean    19.930039   23.286214   18.226328   17.331228   22.591467   20.193446
+std      1.646143    0.784218    1.126192    1.477403    1.562914    1.185180
+min     15.836862   21.313713   14.401524   12.976690   18.807566   16.963778
+25\%     18.547029   22.755110   17.440432   16.166380   21.321595   19.397560
+50\%     20.341514   23.374865   18.349787   17.373647   22.461809   20.264099
+75\%     21.362745   23.793517   18.968572   18.501081   23.992847   20.961033
+max     22.315946   25.387870   21.837865   19.994349   25.306821   23.671558
+
+              6           7           8           9    {\ldots} 
+count  129.000000  129.000000  129.000000  129.000000  {\ldots} 
+mean    18.133973   23.193300   18.687522   19.516615  {\ldots} 
+std      1.751196    1.860021    1.744740    1.068425  {\ldots} 
+min     13.770822   18.824646   16.818849   16.952402  {\ldots} 
+25\%     17.001766   22.036426   18.109188   18.830477  {\ldots}
+50\%     18.421874   23.469361   18.548956   19.546749  {\ldots}
+75\%     19.426085   24.633681   18.967436   20.108405  {\ldots}
+max     21.934433   26.596796   36.306672   22.920624  {\ldots} 
+
+[8 rows x 102 columns]
+\end{Verbatim}
+\end{tcolorbox}
+        
+    In the following compound graph, the distribution of each of the 101 biomarkers is
+shown in histogram form. In this way, one can observe at a birdseye view
+the distribution of the different peptide markers.
+
+From the histograms, one can observe some erratic distributions for some
+of the covariates, where they do not seem to fit very well with the
+statement of the law of large numbers. By this we mean that the shapes
+of the distributions do not fit our expectations of normal
+distributions. Specifically, as an example, the covariates indexed in
+positions \texttt{15}, \texttt{54} or \texttt{78} have some interesting
+shapes as they show multimodal distributions and signs of heavy tails.
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{output_24_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    We continue the analysis with a Principal Component Analysis (PCA),
+which lets us identify the directions of largest variation in the data.
+The data is of high dimension, given that we have 101 explanatory
+variables, so using a dimensionality reduction technique allows us to
+potentially examine a how the datapoints could fit into a lower
+dimensional subspace. We conclude that the amount of variance
+accumulated by the first twenty principal components amounts to almost
+90\%. This justifies our final choice of having the classifiers only
+include ten peptides as features to train on.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{11}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n+nb}{list}\PY{p}{(}\PY{n}{itertools}\PY{o}{.}\PY{n}{accumulate}\PY{p}{(}\PY{n}{pca}\PY{o}{.}\PY{n}{explained\PYZus{}variance\PYZus{}ratio\PYZus{}}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{11}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+[<matplotlib.lines.Line2D at 0x779719e76560>]
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{output_26_1.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    \hypertarget{train-test-split}{%
+\section{Train-Test Split}\label{train-test-split}}
+
+    We separate the data into two sets: the training set, containing two
+thirds of the data, and the test set, containing the rest. We will use
+these sets to fit different models in the next section. We also set a
+numpy seed to allow for the reproducibility of the results. The exact
+size of the train-test split is provided for completeness.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{26}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{np}\PY{o}{.}\PY{n}{random}\PY{o}{.}\PY{n}{seed}\PY{p}{(}\PY{l+m+mi}{1234}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{32}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{o}{.}\PY{n}{shape}\PY{p}{,} \PY{n}{X\PYZus{}test}\PY{o}{.}\PY{n}{shape}\PY{p}{,} \PY{n}{y\PYZus{}train}\PY{o}{.}\PY{n}{shape}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{o}{.}\PY{n}{shape}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+(86, 102) (43, 102) (86,) (43,)
+    \end{Verbatim}
+
+    \hypertarget{model-building-and-fitting}{%
+\section{Model building and
+fitting}\label{model-building-and-fitting}}
+
+    The following models are fitted: a Random Forest Classifier and two
+Boosting Classifiers (Gradient boosting and XGBoost).
+
+    \hypertarget{random-forest-classifier}{%
+\subsection{Random Forest
+Classifier}\label{random-forest-classifier}}
+
+A random forest classifier is built using the \texttt{scikit-learn}
+library, with the same seed as the one used in the train-test split and
+limiting the number of total features to 10. The hyperparameters are
+explored and tuned using a grid search procedure, which is automated
+thanks to internal methods also from the \texttt{scikit-learn} library.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{24}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{ensemble} \PY{k+kn}{import} \PY{n}{RandomForestClassifier}
+\PY{n}{rf} \PY{o}{=} \PY{n}{RandomForestClassifier}\PY{p}{(}\PY{n}{random\PYZus{}state} \PY{o}{=} \PY{l+m+mi}{1234}\PY{p}{)}
+\PY{n}{parameters} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{n\PYZus{}estimators}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{10}\PY{p}{,}\PY{l+m+mi}{130}\PY{p}{,}\PY{l+m+mi}{20}\PY{p}{)}\PY{p}{,}
+              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{max\PYZus{}features}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{,}\PY{l+m+mi}{5}\PY{p}{,}\PY{l+m+mi}{6}\PY{p}{,}\PY{l+m+mi}{7}\PY{p}{,}\PY{l+m+mi}{8}\PY{p}{,}\PY{l+m+mi}{9}\PY{p}{,}\PY{l+m+mi}{10}\PY{p}{)}
+             \PY{p}{\PYZcb{}}
+\end{Verbatim}
+\end{tcolorbox}
+
+    A simple implementation of the grid search procedure with a \(PMSE\)
+given by cross validation is achieved by calling the
+\texttt{GridSearchCV} function, shown in the following cell.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{33}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{grid\PYZus{}rf} \PY{o}{=} \PY{n}{GridSearchCV}\PY{p}{(}\PY{n}{rf}\PY{p}{,} \PY{n}{parameters}\PY{p}{)}
+\PY{n}{grid\PYZus{}rf}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{p}{,} \PY{n}{y\PYZus{}train}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{33}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+GridSearchCV(estimator=RandomForestClassifier(random\_state=1234),
+             param\_grid=\{'max\_features': (1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+                         'n\_estimators': range(10, 130, 20)\})
+\end{Verbatim}
+\end{tcolorbox}
+        
+    The following table shows the results of the grid search procedure,
+where the hyperparameters of the best model after validation are shown
+to be 7 total features and 10 weak estimators. Note that the performance
+is quite unimpressive, barely improving on the null model.
+
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{34}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+   param\_max\_features param\_n\_estimators  mean\_test\_score  std\_test\_score
+36                  7                 10         0.594118        0.118234
+55                 10                 30         0.582353        0.079792
+48                  9                 10         0.572549        0.142693
+1                   1                 30         0.569935        0.044213
+\end{Verbatim}
+\end{tcolorbox}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Best Parameters: \{'max\_features': 7, 'n\_estimators': 10\}
+    \end{Verbatim}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{35}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+RandomForestClassifier(max\_features=7, n\_estimators=10, random\_state=1234)
+\end{Verbatim}
+\end{tcolorbox}
+        
+    The accuracy and performance of the Random Forest on the test set is
+shown below, with a confusion matrix to showcase its quantitiy of type I
+and type II errors.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{19}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{y\PYZus{}pred} \PY{o}{=} \PY{n}{best\PYZus{}rf}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}
+\PY{n}{accuracy\PYZus{}score}\PY{p}{(}\PY{n}{y\PYZus{}pred}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{19}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+0.5348837209302325
+\end{Verbatim}
+\end{tcolorbox}
+
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{output_43_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    Finally, the most relevant variables in the prediction, as defined by a
+weighted average of how many times they appear in a node of the random
+forest are given by the following table.
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+    Feature  Importance
+51       51    0.057151
+11       11    0.043937
+25       25    0.032852
+96       96    0.030232
+78       78    0.029687
+76       76    0.028671
+5         5    0.027653
+34       34    0.026475
+12       12    0.026456
+62       62    0.024448
+    \end{Verbatim}
+
+    \hypertarget{gradient-boosting}{%
+\subsubsection{Gradient Boosting}\label{gradient-boosting}}
+
+    Using stumps as classification trees for the response variable, we now
+build a gradient boosting model on the stumps as weak learners to then
+compute the misclassification rates of both the learning set and the
+test set, across 2,000 iterations. As was done with the random forest in
+the previous subsection, the hyperparameters of the model are tuned with
+a grid search.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{36}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{ensemble} \PY{k+kn}{import} \PY{n}{GradientBoostingClassifier}
+\PY{n}{gb} \PY{o}{=} \PY{n}{GradientBoostingClassifier}\PY{p}{(}\PY{n}{n\PYZus{}estimators}\PY{o}{=}\PY{l+m+mi}{2000}\PY{p}{,} \PY{n}{random\PYZus{}state}\PY{o}{=}\PY{l+m+mi}{1234}\PY{p}{)}
+\PY{n}{parameters} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{max\PYZus{}depth}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{,}\PY{l+m+mi}{8}\PY{p}{,}\PY{l+m+mi}{16}\PY{p}{)}\PY{p}{\PYZcb{}}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{37}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{grid\PYZus{}gb} \PY{o}{=} \PY{n}{GridSearchCV}\PY{p}{(}\PY{n}{gb}\PY{p}{,} \PY{n}{parameters}\PY{p}{)}
+\PY{n}{grid\PYZus{}gb}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{p}{,} \PY{n}{y\PYZus{}train}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{37}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+GridSearchCV(estimator=GradientBoostingClassifier(n\_estimators=2000,
+                                                  random\_state=1234),
+             param\_grid=\{'max\_depth': (1, 4, 8, 16)\})
+\end{Verbatim}
+\end{tcolorbox}
+
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{24}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+  param\_max\_depth  mean\_test\_score  std\_test\_score
+0               1         0.524183        0.069834
+2               8         0.454248        0.103714
+3              16         0.454248        0.103714
+1               4         0.442484        0.090319
+\end{Verbatim}
+\end{tcolorbox}
+        
+    The results of comparing the validation-set misclassification rates
+attained by different ensemble classifiers based on trees with varying
+maximum depth is shown in the previous table, where we find the stumps
+as being the best performing validation-set learners. We may observe
+already hints of the strong overfitting tendencies of this type of
+model, given their poor out-of-sample performance. In fact, we may track
+the training error across iterations, and as shown in the following plot
+\emph{Gradient Boosting Error Evolution}, the training error decreases
+to almost perfection, while the validation set error remains close to
+the null model, which is a clear sign of overfitting.
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Best Parameters: \{'max\_depth': 1\}
+    \end{Verbatim}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{25}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+Text(0.5, 1.0, 'Gradient Boosting Error Evolution')
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{output_52_2.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    The test-set accuracy and performance of the Gradient Boosting is as
+follows, with its corresponding confusion matrix in the figure below.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{34}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{y\PYZus{}pred} \PY{o}{=} \PY{n}{best\PYZus{}gb}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}
+\PY{n}{accuracy\PYZus{}score}\PY{p}{(}\PY{n}{y\PYZus{}pred}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{34}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+0.627906976744186
+\end{Verbatim}
+\end{tcolorbox}
+
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{output_55_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    \hypertarget{xgboost}{%
+\subsubsection{XGBoost}\label{xgboost}}
+
+    To conclude, we introduce another boosting flavour and analyse its
+performance. It is well-known that the XGBoost attains state of the art
+performance in a wide variety of learning tasks, although as most models
+of its kind, it also shows a tendency to overfit the training data. As
+in the previous two cases, the model's hyperparameters, which are the
+maximum depth of the decision trees and the learning rate, are explored
+in a grid search.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{38}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{xgboost}
+\PY{n}{xgb} \PY{o}{=} \PY{n}{xgboost}\PY{o}{.}\PY{n}{XGBClassifier}\PY{p}{(}\PY{n}{n\PYZus{}estimators}\PY{o}{=}\PY{l+m+mi}{2000}\PY{p}{,} \PY{n}{random\PYZus{}state}\PY{o}{=}\PY{l+m+mi}{1234}\PY{p}{)}
+\PY{n}{parameters} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{max\PYZus{}depth}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{,}\PY{l+m+mi}{8}\PY{p}{,}\PY{l+m+mi}{16}\PY{p}{)}\PY{p}{,}
+             \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{learning\PYZus{}rate}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{]}
+             \PY{p}{\PYZcb{}}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{42}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{grid\PYZus{}xgb} \PY{o}{=} \PY{n}{GridSearchCV}\PY{p}{(}\PY{n}{xgb}\PY{p}{,} \PY{n}{parameters}\PY{p}{)}
+\PY{n}{grid\PYZus{}xgb}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{p}{,} \PY{n}{y\PYZus{}train}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+        
+    The best performing out-of-sample models are shown in the following
+table, where the best four all have the same error rate (the one
+corresponding to the null model) and a learning rate of 0. This is
+because the model strongly overfits the data, which is a consequence of
+the extremely noisy dataset. In fact, due to the the powerful fitting
+capabilities of XGBoost, it strongly favours fitting the large noise in
+the dataset instead of sticking to the weak signal present. Some recent
+analysis on this behaviour and why zero training error is sometimes (but
+not in this case) a good sign can be found in Bartlett et al.~(2020) and
+Hastie et al.~(2020)
+
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{46}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+  param\_learning\_rate param\_max\_depth  mean\_test\_score  std\_test\_score
+0                   0               1         0.581699        0.013072
+1                   0               4         0.581699        0.013072
+2                   0               8         0.581699        0.013072
+3                   0              16         0.581699        0.013072
+4                   2               1         0.511765        0.125613
+\end{Verbatim}
+\end{tcolorbox}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Best Parameters: \{'learning\_rate': 0, 'max\_depth': 1\}
+    \end{Verbatim}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{47}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+XGBClassifier(base\_score=None, booster=None, callbacks=None,
+              colsample\_bylevel=None, colsample\_bynode=None,
+              colsample\_bytree=None, device=None, early\_stopping\_rounds=None,
+              enable\_categorical=False, eval\_metric=None, feature\_types=None,
+              gamma=None, grow\_policy=None, importance\_type=None,
+              interaction\_constraints=None, learning\_rate=0, max\_bin=None,
+              max\_cat\_threshold=None, max\_cat\_to\_onehot=None,
+              max\_delta\_step=None, max\_depth=1, max\_leaves=None,
+              min\_child\_weight=None, missing=nan, monotone\_constraints=None,
+              multi\_strategy=None, n\_estimators=None, n\_jobs=None,
+              num\_parallel\_tree=None, random\_state=1234, {\ldots})
+\end{Verbatim}
+\end{tcolorbox}
+        
+    The reason for the inclusion of the previous chunk of text is that we intend to show that the chosen model by the grid search is indeed the null model. The accuracy and performance on
+the test set of XGBoost is as follows, with its corresponding confusion
+matrix in the figure below, which again shows how the final preferred
+model is just the null model that always predicts the most common class.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{48}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{y\PYZus{}pred} \PY{o}{=} \PY{n}{best\PYZus{}xgb}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}
+\PY{n}{accuracy\PYZus{}score}\PY{p}{(}\PY{n}{y\PYZus{}pred}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{48}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+0.5581395348837209
+\end{Verbatim}
+\end{tcolorbox}
+    
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{output_65_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    We can see how the gradient boosting always predicts the most common
+class, and so has a large amount of misclassification errors, and in particular Type II errors.
+
+    \hypertarget{predictor-comparison-and-conclusions}{%
+\section{Predictor comparison and
+Conclusions}\label{predictor-comparison-and-conclusions}}
+
+    The test set accuracies of the three proposed models are the following:
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Accuracy of RF: 0.5348837209302325
+Accuracy of GB: 0.627906976744186
+Accuracy of XGB: 0.5581395348837209
+
+F1-loss of RF: 0.3333333333333333
+F1-loss of GB: 0.4666666666666667
+F1-loss of XGB: 0.0
+    \end{Verbatim}
+
+    We can see that, in general, they're not very high. This can be due to
+the large number of NaNs in the data used and them being fitted by
+interpolation, which may have dampened the signal present in the data.
+However, a similar analysis removing the data altogether (not present in
+the final report) showed no improvement. As such, we may conclude that
+the issue is the large amount of noise in the data where our models are
+all very good at fitting the training data and therefore extremely
+vulnerable at overfitting it.
+
+In terms of relative performance, the Gradient Boosting method obtained
+the best test-set performance, in fact it is considerably better than
+the other two methods which are essentially the null model (XGBoost),
+and a noisy version of it (Random Forest). For this reason, the
+classifier we would choose would be Gradient Boosting.
+
+    Using Gradient Boosting, the best performing model, the ten most
+relevant recurrence biomarkers are the following peptides:
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+    Feature  Importance
+51       51    0.123774
+11       11    0.112551
+65       65    0.089577
+60       60    0.067424
+38       38    0.067323
+70       70    0.067106
+76       76    0.058383
+19       19    0.048530
+75       75    0.036543
+67       67    0.032089
+    \end{Verbatim}
+
+    \hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
+
+    Since there is a considerable amount of missing values in the dataset,
+we resorted to imputing the linear interpolation of the missing entries.
+This allowed us to work with more information, but it can be argued that
+some quality was lost (as we saw in the accuracies). More advanced
+techniques to deal with the missing values for this dataset could be
+considered, however, the authors claim that an ideal study of this field
+should be done with a more complete dataset, of with more field
+knowledge about the biomarkers themselves.
+
+Due to the large amount of noise in the dataset, as seen in the
+histogram distribution of the pepties in section \texttt{2}, and the
+large overfitting tendencies of all three models, other approaches which
+are more robust to noisy datasets should be considered. For instance,
+regularisation techniques could help in avoiding strong overftting and
+the use of \textbf{LightGBM} as a more robust ensemble method could be
+tried out in future studies.
+
+All in all, the best performing model was found to be better than the
+null model, which is a positive result, despite the fact that its
+overall performance was far from impressive.
+
+    \hypertarget{references}{%
+\section{References}\label{references}}
+
+\begin{itemize}
+\tightlist
+\item
+  Bartlett, P. L. Long, P. M. Lugosi, G. Tsigler, A. (2020) \emph{Benign
+  Overfitting in Linear Regression}. ArXiv.
+\item
+  Hastie, T. Montanari, A. Rosset, S. Tibshirani, R. J. (2020)
+  \emph{Surprises in high-dimensional Ridgeless Least Squares
+  Interpolation}. ArXiv.
+\end{itemize}
+
+\newpage
+    \hypertarget{appendix}{%
+\section{Appendix}\label{appendix}}
+
+All the code may be found in this appendix to be reproducible
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{49}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
+\PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
+\PY{k+kn}{import} \PY{n+nn}{sklearn}
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{metrics} \PY{k+kn}{import} \PY{n}{accuracy\PYZus{}score}\PY{p}{,} \PY{n}{zero\PYZus{}one\PYZus{}loss}\PY{p}{,} \PY{n}{f1\PYZus{}score}
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{metrics} \PY{k+kn}{import} \PY{n}{confusion\PYZus{}matrix}\PY{p}{,} \PY{n}{classification\PYZus{}report}\PY{p}{,} \PY{n}{ConfusionMatrixDisplay}
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{model\PYZus{}selection} \PY{k+kn}{import} \PY{n}{GridSearchCV}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{19}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{} cancerDat.csv}
+\PY{n}{df1} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{cancerDat.csv}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{sep} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{;}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{decimal} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{,}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{df1} \PY{o}{=} \PY{n}{df1}\PY{o}{.}\PY{n}{T}
+\PY{n}{df1} \PY{o}{=} \PY{n}{df1}\PY{o}{.}\PY{n}{drop}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Unnamed: 0}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{axis}\PY{o}{=}\PY{l+m+mi}{0}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} cancerInfo.csv}
+\PY{n}{df2} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{cancerInfo.csv}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{sep} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{;}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{df2} \PY{o}{=} \PY{n}{df2}\PY{o}{.}\PY{n}{drop}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Unnamed: 0}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Group}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{axis} \PY{o}{=} \PY{l+m+mi}{1}\PY{p}{)}
+\PY{n}{df2}\PY{o}{.}\PY{n}{index} \PY{o}{=} \PY{n}{df2}\PY{o}{.}\PY{n}{iloc}\PY{p}{[}\PY{p}{:}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{]}
+\PY{n}{df2} \PY{o}{=} \PY{n}{df2}\PY{o}{.}\PY{n}{drop}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{sampleNames}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{axis} \PY{o}{=} \PY{l+m+mi}{1}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{7}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{df1}\PY{o}{.}\PY{n}{shape}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{df2}\PY{o}{.}\PY{n}{shape}\PY{p}{)}
+\PY{n}{display}\PY{p}{(}\PY{n}{df1}\PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+\PY{n}{display}\PY{p}{(}\PY{n}{df2}\PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+(129, 102)
+(129, 1)
+    \end{Verbatim}
+
+    
+    \begin{Verbatim}[commandchars=\\\{\}]
+                0          1          2          3          4          5    \textbackslash{}
+NO.REC\_1  21.923472  24.442617  19.050562  18.482667  24.086793   20.32946   
+NO.REC\_2  21.020165  23.649841  18.402413  19.088996  24.710323  21.495392   
+NO.REC\_3  19.585788  23.736128  18.191527   16.33124  21.917326  20.284533   
+NO.REC\_4  19.061767  23.374865  17.692775   15.36272  21.484924  18.379603   
+NO.REC\_5  18.547029  23.039588  19.066973  15.835721  21.339587  19.550809   
+
+                6          7          8          9    {\ldots}        92   \textbackslash{}
+NO.REC\_1  19.304363  24.270429  18.878984  18.752264  {\ldots}  19.439382   
+NO.REC\_2  19.454826  25.807051  19.091796  19.213397  {\ldots}  20.631064   
+NO.REC\_3  16.853825  22.661125  18.215654  20.821777  {\ldots}  19.123832   
+NO.REC\_4  16.513507  21.401436   18.38696  19.847221  {\ldots}  17.958307   
+NO.REC\_5  16.831653  21.776832   17.85408  20.368534  {\ldots}  18.212854   
+
+                93         94         95         96         97         98   \textbackslash{}
+NO.REC\_1  16.142102  22.858297  22.262118  18.079186  17.151515  20.912124   
+NO.REC\_2        NaN  22.028998  22.031468  17.101384  18.315637  21.512601   
+NO.REC\_3  16.171227  23.143305  22.334392  17.159968  16.859732  19.076147   
+NO.REC\_4        NaN  19.183961  17.851328  16.564709  15.161135  18.190653   
+NO.REC\_5        NaN  22.228449  21.385404  17.072001  15.071656  18.896095   
+
+                99         100        101  
+NO.REC\_1  17.298159  19.097263   21.21211  
+NO.REC\_2  17.100711  18.875548  23.980238  
+NO.REC\_3  15.417028  16.340283  19.810886  
+NO.REC\_4  15.269443  15.411408  18.351433  
+NO.REC\_5  15.147357        NaN   20.28779  
+
+[5 rows x 102 columns]
+    \end{Verbatim}
+
+    
+    
+    \begin{Verbatim}[commandchars=\\\{\}]
+            sites
+sampleNames      
+NO.REC\_1        A
+NO.REC\_2        B
+NO.REC\_3        C
+NO.REC\_4        C
+NO.REC\_5        C
+    \end{Verbatim}
+
+    
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{8}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{indices1} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{n}{df1}\PY{o}{.}\PY{n}{index}\PY{p}{)}\PY{o}{.}\PY{n}{astype}\PY{p}{(}\PY{n+nb}{str}\PY{p}{)}
+\PY{n}{index\PYZus{}array1} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{zeros}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{indices1}\PY{p}{)}\PY{p}{)}
+\PY{n}{labels\PYZus{}1} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{char}\PY{o}{.}\PY{n}{startswith}\PY{p}{(}\PY{n}{indices1}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{NO.REC\PYZus{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{char}\PY{o}{.}\PY{n}{startswith}\PY{p}{(}\PY{n}{indices1}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{REC\PYZus{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{,} \PY{n}{index\PYZus{}array1}\PY{p}{)}\PY{p}{)}
+
+\PY{n}{indices2} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{n}{df2}\PY{o}{.}\PY{n}{index}\PY{p}{)}\PY{o}{.}\PY{n}{astype}\PY{p}{(}\PY{n+nb}{str}\PY{p}{)}
+\PY{n}{index\PYZus{}array2} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{zeros}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{indices2}\PY{p}{)}\PY{p}{)}
+\PY{n}{labels\PYZus{}2} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{char}\PY{o}{.}\PY{n}{startswith}\PY{p}{(}\PY{n}{indices2}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{NO.REC\PYZus{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{char}\PY{o}{.}\PY{n}{startswith}\PY{p}{(}\PY{n}{indices2}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{REC\PYZus{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{,} \PY{n}{index\PYZus{}array2}\PY{p}{)}\PY{p}{)}
+
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Labels are equal: }\PY{l+s+s2}{\PYZdq{}} \PY{o}{+} \PY{n+nb}{str}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{array\PYZus{}equal}\PY{p}{(}\PY{n}{labels\PYZus{}1}\PY{p}{,} \PY{n}{labels\PYZus{}2}\PY{p}{)}\PY{p}{)}\PY{p}{)} \PY{c+c1}{\PYZsh{} That is we can define a single response variable y for the two files}
+\PY{n}{y} \PY{o}{=} \PY{n}{labels\PYZus{}1}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Labels are equal: True
+    \end{Verbatim}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{11}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{y} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{Series}\PY{p}{(}\PY{n}{y}\PY{p}{)}
+\PY{n}{display}\PY{p}{(}\PY{n}{y}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    
+    \begin{Verbatim}[commandchars=\\\{\}]
+0      0.0
+1      0.0
+2      0.0
+3      0.0
+4      0.0
+      {\ldots} 
+124    1.0
+125    1.0
+126    1.0
+127    1.0
+128    1.0
+Length: 129, dtype: float64
+    \end{Verbatim}
+
+    
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{20}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{for} \PY{n}{col} \PY{o+ow}{in} \PY{n}{df1}\PY{p}{:}
+    \PY{n}{df1}\PY{p}{[}\PY{n}{col}\PY{p}{]} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{to\PYZus{}numeric}\PY{p}{(}\PY{n}{df1}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{,} \PY{n}{errors}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{coerce}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{df1}\PY{o}{.}\PY{n}{dtypes}\PY{p}{;}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{df1}\PY{o}{.}\PY{n}{isnull}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{values}\PY{o}{.}\PY{n}{any}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{n+nb}{sum}\PY{p}{(}\PY{n}{df1}\PY{o}{.}\PY{n}{isnull}\PY{p}{(}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\PY{n}{df1} \PY{o}{=} \PY{n}{df1}\PY{o}{.}\PY{n}{interpolate}\PY{p}{(}\PY{n}{method} \PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{linear}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{limit\PYZus{}direction} \PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{forward}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{df1}\PY{o}{.}\PY{n}{isnull}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{values}\PY{o}{.}\PY{n}{any}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{df2}\PY{o}{.}\PY{n}{isnull}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{values}\PY{o}{.}\PY{n}{any}\PY{p}{(}\PY{p}{)}\PY{p}{)} \PY{c+c1}{\PYZsh{} False \PYZhy{}\PYZgt{} No nulls}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{df1}\PY{o}{.}\PY{n}{describe}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{df1}\PY{o}{.}\PY{n}{hist}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{12}\PY{p}{,}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{tight\PYZus{}layout}\PY{p}{(}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{decomposition} \PY{k+kn}{import} \PY{n}{PCA}
+\PY{k+kn}{import} \PY{n+nn}{itertools}
+\PY{n}{pca} \PY{o}{=} \PY{n}{PCA}\PY{p}{(}\PY{n}{n\PYZus{}components}\PY{o}{=}\PY{l+m+mi}{20}\PY{p}{)}
+\PY{n}{pca}\PY{o}{.}\PY{n}{fit\PYZus{}transform}\PY{p}{(}\PY{n}{df1}\PY{p}{)}
+\PY{c+c1}{\PYZsh{}print(pca.explained\PYZus{}variance\PYZus{}ratio\PYZus{})}
+\PY{c+c1}{\PYZsh{}print(list(itertools.accumulate(pca.explained\PYZus{}variance\PYZus{}ratio\PYZus{})))}
+\PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n+nb}{list}\PY{p}{(}\PY{n}{itertools}\PY{o}{.}\PY{n}{accumulate}\PY{p}{(}\PY{n}{pca}\PY{o}{.}\PY{n}{explained\PYZus{}variance\PYZus{}ratio\PYZus{}}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{model\PYZus{}selection} \PY{k+kn}{import} \PY{n}{train\PYZus{}test\PYZus{}split}
+\PY{n}{np}\PY{o}{.}\PY{n}{random}\PY{o}{.}\PY{n}{seed}\PY{p}{(}\PY{l+m+mi}{1234}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{ensemble} \PY{k+kn}{import} \PY{n}{RandomForestClassifier}
+\PY{n}{rf} \PY{o}{=} \PY{n}{RandomForestClassifier}\PY{p}{(}\PY{n}{random\PYZus{}state} \PY{o}{=} \PY{l+m+mi}{1234}\PY{p}{)}
+\PY{n}{parameters} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{n\PYZus{}estimators}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{10}\PY{p}{,}\PY{l+m+mi}{130}\PY{p}{,}\PY{l+m+mi}{20}\PY{p}{)}\PY{p}{,}
+              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{max\PYZus{}features}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{,}\PY{l+m+mi}{5}\PY{p}{,}\PY{l+m+mi}{6}\PY{p}{,}\PY{l+m+mi}{7}\PY{p}{,}\PY{l+m+mi}{8}\PY{p}{,}\PY{l+m+mi}{9}\PY{p}{,}\PY{l+m+mi}{10}\PY{p}{)}
+             \PY{p}{\PYZcb{}}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{grid\PYZus{}rf} \PY{o}{=} \PY{n}{GridSearchCV}\PY{p}{(}\PY{n}{rf}\PY{p}{,} \PY{n}{parameters}\PY{p}{)}
+\PY{n}{grid\PYZus{}rf}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{p}{,} \PY{n}{y\PYZus{}train}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{rf\PYZus{}results} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{DataFrame}\PY{p}{(}\PY{n}{grid\PYZus{}rf}\PY{o}{.}\PY{n}{cv\PYZus{}results\PYZus{}}\PY{p}{)}
+\PY{n}{rf\PYZus{}results}\PY{o}{.}\PY{n}{filter}\PY{p}{(}\PY{n}{regex} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{(param.*|mean\PYZus{}t|std\PYZus{}t)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PYZbs{}
+    \PY{o}{.}\PY{n}{drop}\PY{p}{(}\PY{n}{columns} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{params}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PYZbs{}
+    \PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{mean\PYZus{}test\PYZus{}score}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{ascending} \PY{o}{=} \PY{k+kc}{False}\PY{p}{)} \PYZbs{}
+    \PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{l+m+mi}{4}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{best\PYZus{}params} \PY{o}{=} \PY{n}{grid\PYZus{}rf}\PY{o}{.}\PY{n}{best\PYZus{}params\PYZus{}}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Best Parameters:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{best\PYZus{}params}\PY{p}{)}
+\PY{n}{best\PYZus{}rf} \PY{o}{=} \PY{n}{RandomForestClassifier}\PY{p}{(}\PY{o}{*}\PY{o}{*}\PY{n}{best\PYZus{}params}\PY{p}{,} \PY{n}{random\PYZus{}state}\PY{o}{=}\PY{l+m+mi}{1234}\PY{p}{)}
+\PY{n}{best\PYZus{}rf}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{p}{,} \PY{n}{y\PYZus{}train}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{y\PYZus{}pred} \PY{o}{=} \PY{n}{best\PYZus{}rf}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}
+\PY{n}{accuracy\PYZus{}score}\PY{p}{(}\PY{n}{y\PYZus{}pred}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{confusion\PYZus{}mtx} \PY{o}{=} \PY{n}{confusion\PYZus{}matrix}\PY{p}{(}\PY{n}{y\PYZus{}test}\PY{p}{,} \PY{n}{y\PYZus{}pred}\PY{p}{)} 
+\PY{n}{disp} \PY{o}{=} \PY{n}{ConfusionMatrixDisplay}\PY{p}{(}\PY{n}{confusion\PYZus{}matrix}\PY{o}{=} \PY{n}{confusion\PYZus{}mtx}\PY{p}{,} \PY{n}{display\PYZus{}labels}\PY{o}{=} \PY{k+kc}{None}\PY{p}{)}
+\PY{n}{disp}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{cmap}\PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{cm}\PY{o}{.}\PY{n}{Blues}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Confusion matrix Random Forest}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{feature\PYZus{}importances} \PY{o}{=} \PY{n}{best\PYZus{}rf}\PY{o}{.}\PY{n}{feature\PYZus{}importances\PYZus{}}
+\PY{n}{importance\PYZus{}df} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{DataFrame}\PY{p}{(}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Feature}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{n}{X\PYZus{}train}\PY{o}{.}\PY{n}{columns}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Importance}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{n}{feature\PYZus{}importances}\PY{p}{\PYZcb{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{importance\PYZus{}df}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{n}{by}\PY{o}{=}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Importance}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{ascending}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}\PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{ensemble} \PY{k+kn}{import} \PY{n}{GradientBoostingClassifier}
+\PY{n}{gb} \PY{o}{=} \PY{n}{GradientBoostingClassifier}\PY{p}{(}\PY{n}{n\PYZus{}estimators}\PY{o}{=}\PY{l+m+mi}{2000}\PY{p}{,} \PY{n}{random\PYZus{}state}\PY{o}{=}\PY{l+m+mi}{1234}\PY{p}{)}
+\PY{n}{parameters} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{max\PYZus{}depth}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{,}\PY{l+m+mi}{8}\PY{p}{,}\PY{l+m+mi}{16}\PY{p}{)}\PY{p}{\PYZcb{}}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{grid\PYZus{}gb} \PY{o}{=} \PY{n}{GridSearchCV}\PY{p}{(}\PY{n}{gb}\PY{p}{,} \PY{n}{parameters}\PY{p}{)}
+\PY{n}{grid\PYZus{}gb}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{p}{,} \PY{n}{y\PYZus{}train}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{gb\PYZus{}results} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{DataFrame}\PY{p}{(}\PY{n}{grid\PYZus{}gb}\PY{o}{.}\PY{n}{cv\PYZus{}results\PYZus{}}\PY{p}{)}
+\PY{n}{gb\PYZus{}results}\PY{o}{.}\PY{n}{filter}\PY{p}{(}\PY{n}{regex} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{(param.*|mean\PYZus{}t|std\PYZus{}t)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PYZbs{}
+    \PY{o}{.}\PY{n}{drop}\PY{p}{(}\PY{n}{columns} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{params}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PYZbs{}
+    \PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{mean\PYZus{}test\PYZus{}score}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{ascending} \PY{o}{=} \PY{k+kc}{False}\PY{p}{)} \PYZbs{}
+    \PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{l+m+mi}{4}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{y\PYZus{}pred} \PY{o}{=} \PY{n}{best\PYZus{}gb}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}
+\PY{n}{accuracy\PYZus{}score}\PY{p}{(}\PY{n}{y\PYZus{}pred}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{best\PYZus{}params} \PY{o}{=} \PY{n}{grid\PYZus{}gb}\PY{o}{.}\PY{n}{best\PYZus{}params\PYZus{}}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Best Parameters:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{best\PYZus{}params}\PY{p}{)}
+
+\PY{n}{train\PYZus{}errors} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+\PY{n}{best\PYZus{}gb} \PY{o}{=} \PY{n}{GradientBoostingClassifier}\PY{p}{(}\PY{o}{*}\PY{o}{*}\PY{n}{best\PYZus{}params}\PY{p}{,} \PY{n}{random\PYZus{}state}\PY{o}{=}\PY{l+m+mi}{1234}\PY{p}{)}
+\PY{n}{best\PYZus{}gb}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{p}{,} \PY{n}{y\PYZus{}train}\PY{p}{)}
+
+\PY{k}{for} \PY{n}{i}\PY{p}{,} \PY{n}{y\PYZus{}pred\PYZus{}train} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{best\PYZus{}gb}\PY{o}{.}\PY{n}{staged\PYZus{}predict}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{p}{)}\PY{p}{)}\PY{p}{:}
+    \PY{n}{train\PYZus{}errors}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{zero\PYZus{}one\PYZus{}loss}\PY{p}{(}\PY{n}{y\PYZus{}train}\PY{p}{,} \PY{n}{y\PYZus{}pred\PYZus{}train}\PY{p}{)}\PY{p}{)}
+
+\PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{arange}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{100}\PY{p}{)}\PY{p}{,} \PY{n}{train\PYZus{}errors}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{xlabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Boosting iterations}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{ylabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Misclassification rate}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Gradient Boosting Error Evolution}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{y\PYZus{}pred} \PY{o}{=} \PY{n}{best\PYZus{}gb}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}
+\PY{n}{accuracy\PYZus{}score}\PY{p}{(}\PY{n}{y\PYZus{}pred}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{confusion\PYZus{}mtx} \PY{o}{=} \PY{n}{confusion\PYZus{}matrix}\PY{p}{(}\PY{n}{y\PYZus{}test}\PY{p}{,} \PY{n}{y\PYZus{}pred}\PY{p}{)} 
+\PY{n}{disp} \PY{o}{=} \PY{n}{ConfusionMatrixDisplay}\PY{p}{(}\PY{n}{confusion\PYZus{}matrix}\PY{o}{=} \PY{n}{confusion\PYZus{}mtx}\PY{p}{,} \PY{n}{display\PYZus{}labels}\PY{o}{=} \PY{k+kc}{None}\PY{p}{)}
+\PY{n}{disp}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{cmap}\PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{cm}\PY{o}{.}\PY{n}{Blues}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Confusion matrix Gradient Boosting}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{xgboost}
+\PY{n}{xgb} \PY{o}{=} \PY{n}{xgboost}\PY{o}{.}\PY{n}{XGBClassifier}\PY{p}{(}\PY{n}{n\PYZus{}estimators}\PY{o}{=}\PY{l+m+mi}{2000}\PY{p}{,} \PY{n}{random\PYZus{}state}\PY{o}{=}\PY{l+m+mi}{1234}\PY{p}{)}
+\PY{n}{parameters} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{max\PYZus{}depth}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{,}\PY{l+m+mi}{8}\PY{p}{,}\PY{l+m+mi}{16}\PY{p}{)}\PY{p}{,}
+             \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{learning\PYZus{}rate}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{]}
+             \PY{p}{\PYZcb{}}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{grid\PYZus{}xgb} \PY{o}{=} \PY{n}{GridSearchCV}\PY{p}{(}\PY{n}{xgb}\PY{p}{,} \PY{n}{parameters}\PY{p}{)}
+\PY{n}{grid\PYZus{}xgb}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{p}{,} \PY{n}{y\PYZus{}train}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{xgb\PYZus{}results} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{DataFrame}\PY{p}{(}\PY{n}{grid\PYZus{}xgb}\PY{o}{.}\PY{n}{cv\PYZus{}results\PYZus{}}\PY{p}{)}
+\PY{n}{xgb\PYZus{}results}\PY{o}{.}\PY{n}{filter}\PY{p}{(}\PY{n}{regex} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{(param.*|mean\PYZus{}t|std\PYZus{}t)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PYZbs{}
+    \PY{o}{.}\PY{n}{drop}\PY{p}{(}\PY{n}{columns} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{params}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PYZbs{}
+    \PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{mean\PYZus{}test\PYZus{}score}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{ascending} \PY{o}{=} \PY{k+kc}{False}\PY{p}{)} \PYZbs{}
+    \PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{l+m+mi}{5}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{best\PYZus{}params} \PY{o}{=} \PY{n}{grid\PYZus{}xgb}\PY{o}{.}\PY{n}{best\PYZus{}params\PYZus{}}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Best Parameters:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{best\PYZus{}params}\PY{p}{)}
+
+\PY{n}{best\PYZus{}xgb} \PY{o}{=} \PY{n}{xgboost}\PY{o}{.}\PY{n}{XGBClassifier}\PY{p}{(}\PY{o}{*}\PY{o}{*}\PY{n}{best\PYZus{}params}\PY{p}{,} \PY{n}{random\PYZus{}state}\PY{o}{=}\PY{l+m+mi}{1234}\PY{p}{)}
+\PY{n}{best\PYZus{}xgb}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{X\PYZus{}train}\PY{p}{,} \PY{n}{y\PYZus{}train}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{y\PYZus{}pred} \PY{o}{=} \PY{n}{best\PYZus{}xgb}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}
+\PY{n}{accuracy\PYZus{}score}\PY{p}{(}\PY{n}{y\PYZus{}pred}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{confusion\PYZus{}mtx} \PY{o}{=} \PY{n}{confusion\PYZus{}matrix}\PY{p}{(}\PY{n}{y\PYZus{}test}\PY{p}{,} \PY{n}{y\PYZus{}pred}\PY{p}{)} 
+\PY{n}{disp} \PY{o}{=} \PY{n}{ConfusionMatrixDisplay}\PY{p}{(}\PY{n}{confusion\PYZus{}matrix}\PY{o}{=} \PY{n}{confusion\PYZus{}mtx}\PY{p}{,} \PY{n}{display\PYZus{}labels}\PY{o}{=} \PY{k+kc}{None}\PY{p}{)}
+\PY{n}{disp}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{cmap}\PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{cm}\PY{o}{.}\PY{n}{Blues}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Confusion matrix XGBoost}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Accuracy of RF:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{accuracy\PYZus{}score}\PY{p}{(}\PY{n}{best\PYZus{}rf}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Accuracy of GB:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{accuracy\PYZus{}score}\PY{p}{(}\PY{n}{best\PYZus{}gb}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Accuracy of XGB:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{accuracy\PYZus{}score}\PY{p}{(}\PY{n}{best\PYZus{}xgb}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{F1\PYZhy{}loss of RF:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{f1\PYZus{}score}\PY{p}{(}\PY{n}{best\PYZus{}rf}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{F1\PYZhy{}loss of GB:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{f1\PYZus{}score}\PY{p}{(}\PY{n}{best\PYZus{}gb}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{F1\PYZhy{}loss of XGB:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{f1\PYZus{}score}\PY{p}{(}\PY{n}{best\PYZus{}xgb}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}test}\PY{p}{)}\PY{p}{,} \PY{n}{y\PYZus{}test}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{feature\PYZus{}importances} \PY{o}{=} \PY{n}{best\PYZus{}gb}\PY{o}{.}\PY{n}{feature\PYZus{}importances\PYZus{}}
+\PY{n}{importance\PYZus{}gb} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{DataFrame}\PY{p}{(}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Feature}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{n}{X\PYZus{}train}\PY{o}{.}\PY{n}{columns}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Importance}\PY{l+s+s1}{\PYZsq{}} \PY{p}{:} \PY{n}{feature\PYZus{}importances}\PY{p}{\PYZcb{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{importance\PYZus{}gb}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{n}{by}\PY{o}{=}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Importance}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{ascending}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}\PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+
+\end{Verbatim}
+\end{tcolorbox}
+    
+    
+    
+\end{document}
